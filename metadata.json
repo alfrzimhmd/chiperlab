@@ -1,0 +1,6 @@
+{
+  "name": "ChiperLab",
+  "description": "ChiperLab is an interactive cryptography learning platform for exploring encryption, hashing, cryptanalysis, and cybersecurity concepts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
