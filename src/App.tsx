@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProgressProvider } from './context/ProgressContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
@@ -24,7 +24,7 @@ import { ProgressPage } from './pages/ProgressPage';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ProgressProvider>
         <ScrollToTop />
         <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
@@ -64,6 +64,6 @@ export default function App() {
           <Footer />
         </div>
       </ProgressProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }

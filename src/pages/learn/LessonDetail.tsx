@@ -29,7 +29,7 @@ export function LessonDetail() {
 
   if (!lesson) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center space-y-4">
+      <div className="max-w-[1100px] mx-auto px-4 py-16 text-center space-y-4">
         <h1 className="text-xl font-bold text-slate-900 dark:text-white">Lesson Not Found</h1>
         <p className="text-sm text-slate-500">The lesson you requested does not exist or has moved.</p>
         <Link to="/learn/fundamentals" className="text-sky-600 dark:text-sky-400 font-semibold hover:underline text-sm">
@@ -63,7 +63,7 @@ export function LessonDetail() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200">
+    <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200">
       {/* Top Navigation Bar */}
       <div className="flex items-center justify-between">
         <Link
