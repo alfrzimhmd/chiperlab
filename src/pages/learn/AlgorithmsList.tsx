@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ALGORITHMS } from '../../data/algorithms';
 import { AlgorithmCard } from '../../components/learning/AlgorithmCard';
 import { useProgress } from '../../hooks/useProgress';
-import { Key, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Key } from 'lucide-react';
 import { AlgorithmCategory } from '../../types/crypto';
 
 export function AlgorithmsList() {
@@ -15,40 +15,43 @@ export function AlgorithmsList() {
   });
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in duration-200">
       {/* Header */}
-      <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800/80 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">
+      <div className="space-y-3 max-w-2xl">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border border-purple-500/30 bg-purple-500/10 text-purple-400">
           <Key className="w-3.5 h-3.5" />
-          Cryptographic Algorithms Catalog
+          <span className="tracking-wide uppercase text-[11px] font-medium">
+            Cryptographic Algorithms
+          </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">
           Classical and Modern Ciphers
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-          From ancient military transposition and Caesar shifts to quantum-resistant hashing and 256-bit Galois/Counter Mode authenticated encryption.
+        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+          From ancient military transposition and Caesar shifts to quantum-resistant hashing and
+          256-bit Galois/Counter Mode authenticated encryption.
         </p>
       </div>
 
       {/* Category Tabs */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-fit">
+      <div className="flex items-center gap-1.5 p-1.5 rounded-xl bg-[var(--surface-main)] border border-[var(--border-main)] w-fit shadow-lg">
         {(['all', 'classical', 'modern', 'hashing'] as const).map(cat => (
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition-colors cursor-pointer ${
+            className={`px-4 py-2 rounded-lg text-xs font-mono font-semibold capitalize transition-colors cursor-pointer ${
               selectedCategory === cat
-                ? 'bg-sky-600 text-white dark:bg-sky-500 shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-cyan-500 text-black'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-secondary)]'
             }`}
           >
-            {cat === 'all' ? 'All Algorithms' : `${cat} Ciphers`}
+            {cat === 'all' ? 'All Algorithms' : `${cat}`}
           </button>
         ))}
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {filteredAlgorithms.map(algo => (
           <AlgorithmCard
             key={algo.id}
@@ -58,79 +61,47 @@ export function AlgorithmsList() {
         ))}
       </div>
 
-      {/* Comparison Reference Table */}
-      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-          Quick Cryptographic Comparison Matrix
-        </h3>
+      {/* Comparison Table */}
+      <div className="p-6 sm:p-7 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg space-y-4">
+        <div>
+          <span className="font-mono text-xs font-bold text-cyan-400 tracking-widest block">
+            03 — COMPARISON MATRIX
+          </span>
+          <h3 className="text-lg font-bold text-[var(--text-primary)] tracking-tight mt-1">
+            Quick Cryptographic Comparison
+          </h3>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-semibold">
-                <th className="pb-2 font-mono">ALGORITHM</th>
-                <th className="pb-2">FAMILY</th>
-                <th className="pb-2">KEY SIZE / DIGEST</th>
-                <th className="pb-2">SECURITY STATUS</th>
-                <th className="pb-2">PRIMARY PURPOSE</th>
+              <tr className="border-b border-[var(--border-main)] text-[var(--text-secondary)] font-mono">
+                <th className="pb-3 font-semibold uppercase tracking-wider text-[10px]">Algorithm</th>
+                <th className="pb-3 font-semibold uppercase tracking-wider text-[10px]">Family</th>
+                <th className="pb-3 font-semibold uppercase tracking-wider text-[10px]">Key / Digest</th>
+                <th className="pb-3 font-semibold uppercase tracking-wider text-[10px]">Security</th>
+                <th className="pb-3 font-semibold uppercase tracking-wider text-[10px]">Purpose</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-300">
-              <tr>
-                <td className="py-2.5 font-bold text-slate-900 dark:text-white font-mono">Caesar</td>
-                <td className="py-2.5">Classical Monoalphabetic</td>
-                <td className="py-2.5 font-mono">1–25 shift</td>
-                <td className="py-2.5 text-rose-600 dark:text-rose-400 font-medium">Insecure (Brute-force)</td>
-                <td className="py-2.5">Education / Puzzle</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 font-bold text-slate-900 dark:text-white font-mono">Atbash</td>
-                <td className="py-2.5">Classical Inversion</td>
-                <td className="py-2.5 font-mono">None (Fixed mirror)</td>
-                <td className="py-2.5 text-rose-600 dark:text-rose-400 font-medium">Zero confidentiality</td>
-                <td className="py-2.5">Biblical / Historic</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 font-bold text-slate-900 dark:text-white font-mono">Vigenère</td>
-                <td className="py-2.5">Polyalphabetic</td>
-                <td className="py-2.5 font-mono">Keyword length</td>
-                <td className="py-2.5 text-amber-600 dark:text-amber-400 font-medium">Weak (Kasiski analysis)</td>
-                <td className="py-2.5">Historic diplomacy</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 font-bold text-slate-900 dark:text-white font-mono">XOR</td>
-                <td className="py-2.5">Stream / Bitwise</td>
-                <td className="py-2.5 font-mono">Variable bytes</td>
-                <td className="py-2.5 text-emerald-600 dark:text-emerald-400 font-medium">Unbreakable if OTP, else weak</td>
-                <td className="py-2.5">Primitive building block</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 font-bold text-slate-900 dark:text-white font-mono">AES-GCM</td>
-                <td className="py-2.5">Modern Symmetric Block</td>
-                <td className="py-2.5 font-mono">128 / 256 bits</td>
-                <td className="py-2.5 text-emerald-600 dark:text-emerald-400 font-medium">NSA Top Secret Standard</td>
-                <td className="py-2.5">Disk & TLS payload confidentiality</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 font-bold text-slate-900 dark:text-white font-mono">RSA-OAEP</td>
-                <td className="py-2.5">Modern Asymmetric</td>
-                <td className="py-2.5 font-mono">2048 / 4096 bits</td>
-                <td className="py-2.5 text-emerald-600 dark:text-emerald-400 font-medium">Industry Standard PKI</td>
-                <td className="py-2.5">Key exchange & digital signatures</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 font-bold text-slate-900 dark:text-white font-mono">SHA-256</td>
-                <td className="py-2.5">Cryptographic Hash</td>
-                <td className="py-2.5 font-mono">256-bit fixed digest</td>
-                <td className="py-2.5 text-emerald-600 dark:text-emerald-400 font-medium">Collision resistant</td>
-                <td className="py-2.5">Integrity verification & blockchain</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 font-bold text-slate-900 dark:text-white font-mono">SHA-512</td>
-                <td className="py-2.5">Cryptographic Hash</td>
-                <td className="py-2.5 font-mono">512-bit fixed digest</td>
-                <td className="py-2.5 text-emerald-600 dark:text-emerald-400 font-medium">High-security margin</td>
-                <td className="py-2.5">64-bit architecture hashing</td>
-              </tr>
+            <tbody className="divide-y divide-[var(--border-main)] text-[var(--text-primary)]">
+              {[
+                { name: 'Caesar', family: 'Monoalphabetic', key: '1–25 shift', sec: 'Insecure', secColor: 'text-rose-400', purpose: 'Education' },
+                { name: 'Atbash', family: 'Inversion', key: 'Fixed mirror', sec: 'Zero confidentiality', secColor: 'text-rose-400', purpose: 'Historic' },
+                { name: 'Vigenère', family: 'Polyalphabetic', key: 'Keyword length', sec: 'Weak', secColor: 'text-amber-400', purpose: 'Historic' },
+                { name: 'XOR', family: 'Stream / Bitwise', key: 'Variable bytes', sec: 'Unbreakable if OTP', secColor: 'text-emerald-400', purpose: 'Primitive' },
+                { name: 'AES-GCM', family: 'Symmetric Block', key: '128 / 256 bits', sec: 'NSA Standard', secColor: 'text-emerald-400', purpose: 'Bulk encryption' },
+                { name: 'RSA-OAEP', family: 'Asymmetric', key: '2048 / 4096 bits', sec: 'Industry PKI', secColor: 'text-emerald-400', purpose: 'Key exchange' },
+                { name: 'SHA-256', family: 'Hash', key: '256-bit', sec: 'Collision resistant', secColor: 'text-emerald-400', purpose: 'Integrity' },
+                { name: 'SHA-512', family: 'Hash', key: '512-bit', sec: 'High margin', secColor: 'text-emerald-400', purpose: 'Integrity' },
+              ].map(row => (
+                <tr key={row.name} className="hover:bg-[var(--surface-secondary)] transition-colors">
+                  <td className="py-3 font-bold font-mono text-cyan-400">{row.name}</td>
+                  <td className="py-3 font-mono text-[var(--text-secondary)]">{row.family}</td>
+                  <td className="py-3 font-mono">{row.key}</td>
+                  <td className={`py-3 font-mono font-medium ${row.secColor}`}>{row.sec}</td>
+                  <td className="py-3 font-mono text-[var(--text-secondary)]">{row.purpose}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

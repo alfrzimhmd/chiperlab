@@ -15,14 +15,19 @@ export function SecurityNotice({
     return (
       <div
         id={id}
-        className={`flex items-start gap-3 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 leading-relaxed ${className}`}
+        className={`flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-[var(--text-primary)] leading-relaxed animate-in fade-in duration-300 ${className}`}
       >
-        <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-        <div>
-          <span className="font-semibold block text-amber-950 dark:text-amber-100">
+        <div className="shrink-0 w-9 h-9 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+          <ShieldAlert className="w-4 h-4 text-amber-400" />
+        </div>
+        <div className="pt-0.5">
+          <span className="font-bold block text-amber-400 mb-1 font-mono text-[11px] tracking-wider uppercase">
             Educational Cryptography Notice
           </span>
-          Classical ciphers (Caesar, Atbash, Vigenère, simple XOR) are strictly educational and should never be used to protect sensitive real-world applications or production secrets.
+          <span className="text-[var(--text-secondary)]">
+            Classical ciphers (Caesar, Atbash, Vigenère, simple XOR) are strictly educational
+            and should never be used to protect sensitive real-world applications or production secrets.
+          </span>
         </div>
       </div>
     );
@@ -31,14 +36,20 @@ export function SecurityNotice({
   return (
     <div
       id={id}
-      className={`flex items-start gap-3 p-3.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/60 text-xs text-sky-900 dark:text-sky-200 leading-relaxed ${className}`}
+      className={`flex items-start gap-3 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-xs text-[var(--text-primary)] leading-relaxed animate-in fade-in duration-300 ${className}`}
     >
-      <Info className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" />
-      <div>
-        <span className="font-semibold block text-sky-950 dark:text-sky-100">
+      <div className="shrink-0 w-9 h-9 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center">
+        <Info className="w-4 h-4 text-cyan-400" />
+      </div>
+      <div className="pt-0.5">
+        <span className="font-bold block text-cyan-400 mb-1 font-mono text-[11px] tracking-wider uppercase">
           Educational Use Only
         </span>
-        ChiperLab is designed for learning and experimentation. All computations execute locally in your browser memory. Do not use this playground to protect real-world confidential passwords, private keys, or production data.
+        <span className="text-[var(--text-secondary)]">
+          ChiperLab is designed for learning and experimentation. All computations execute
+          locally in your browser memory. Do not use this playground to protect real-world
+          confidential passwords, private keys, or production data.
+        </span>
       </div>
     </div>
   );

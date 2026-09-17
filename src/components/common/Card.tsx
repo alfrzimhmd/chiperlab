@@ -6,6 +6,8 @@ interface CardProps {
   className?: string;
   hoverable?: boolean;
   onClick?: () => void;
+  variant?: 'default' | 'elevated' | 'subtle';
+  padding?: 'none' | 'sm' | 'md' | 'lg';
 }
 
 export function Card({
@@ -14,16 +16,34 @@ export function Card({
   className = '',
   hoverable = false,
   onClick,
+  variant = 'default',
+  padding = 'md',
 }: CardProps) {
   const hoverClasses = hoverable
-    ? 'hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md transition-all duration-200 cursor-pointer'
+    ? 'hover:border-cyan-500/40 hover:shadow-xl transition-all duration-300 cursor-pointer'
     : '';
+
+  const variantClasses = {
+    default:
+      'bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg',
+    elevated:
+      'bg-[var(--surface-main)] border border-[var(--border-main)] shadow-2xl',
+    subtle:
+      'bg-[var(--surface-secondary)] border border-[var(--border-main)]',
+  };
+
+  const paddingClasses = {
+    none: '',
+    sm: 'p-4',
+    md: 'p-5 sm:p-6',
+    lg: 'p-6 sm:p-8',
+  };
 
   return (
     <div
       id={id}
       onClick={onClick}
-      className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs ${hoverClasses} ${className}`}
+      className={`rounded-2xl ${variantClasses[variant]} ${paddingClasses[padding]} ${hoverClasses} ${className}`}
     >
       {children}
     </div>

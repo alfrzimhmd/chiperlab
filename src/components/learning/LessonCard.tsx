@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Clock, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Clock, CheckCircle2, ArrowRight, Zap } from 'lucide-react';
 import { Lesson } from '../../types/lesson';
 import { Badge } from '../common/Badge';
 
@@ -21,12 +21,12 @@ export function LessonCard({ lesson, isCompleted = false }: LessonCardProps) {
     <Link
       to={`/learn/fundamentals/${lesson.id}`}
       id={`lesson-card-${lesson.id}`}
-      className="group relative flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-sky-300 dark:hover:border-sky-700/80 shadow-xs hover:shadow-md transition-all duration-200 text-left"
+      className="group relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] hover:border-cyan-500/40 shadow-lg hover:shadow-xl transition-all duration-300 text-left"
     >
       <div>
-        <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500">
+            <span className="text-xs font-mono font-bold text-[var(--text-secondary)]">
               #{String(lesson.order).padStart(2, '0')}
             </span>
             <Badge variant={difficultyVariant} size="sm">
@@ -34,32 +34,33 @@ export function LessonCard({ lesson, isCompleted = false }: LessonCardProps) {
             </Badge>
           </div>
           {isCompleted ? (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+            <span className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-md">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Completed
+              DONE
             </span>
           ) : (
-            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1">
+            <span className="text-[11px] font-mono text-[var(--text-secondary)] flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {lesson.estimatedMinutes}m
             </span>
           )}
         </div>
 
-        <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors mb-1.5">
+        <h3 className="text-base font-bold text-[var(--text-primary)] group-hover:text-cyan-400 transition-colors mb-2">
           {lesson.title}
         </h3>
-        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-4">
+        <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed mb-4">
           {lesson.description}
         </p>
       </div>
 
-      <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
-        <span className="text-amber-600 dark:text-amber-400 font-semibold">
+      <div className="pt-4 border-t border-[var(--border-main)] flex items-center justify-between text-xs">
+        <span className="text-amber-400 font-mono font-semibold flex items-center gap-1">
+          <Zap className="w-3 h-3 fill-amber-400" />
           +{lesson.xpReward} XP
         </span>
-        <span className="text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-          {isCompleted ? 'Review Lesson' : 'Start Lesson'} <ArrowRight className="w-3.5 h-3.5" />
+        <span className="text-cyan-400 font-mono font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+          {isCompleted ? 'Review' : 'Start'} <ArrowRight className="w-3.5 h-3.5" />
         </span>
       </div>
     </Link>

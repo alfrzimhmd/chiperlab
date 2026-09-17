@@ -1,10 +1,10 @@
 interface ProgressBarProps {
   id?: string;
-  value: number; // 0 to 100
+  value: number;
   max?: number;
   label?: string;
   showPercent?: boolean;
-  color?: 'primary' | 'success' | 'amber' | 'indigo';
+  color?: 'primary' | 'success' | 'amber' | 'indigo' | 'teal';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -23,28 +23,31 @@ export function ProgressBar({
 
   const heightClasses = {
     sm: 'h-1.5',
-    md: 'h-2.5',
-    lg: 'h-4',
+    md: 'h-2',
+    lg: 'h-2.5',
   };
 
   const barColors = {
-    primary: 'bg-sky-500 dark:bg-sky-400',
-    success: 'bg-emerald-500 dark:bg-emerald-400',
-    amber: 'bg-amber-500 dark:bg-amber-400',
-    indigo: 'bg-indigo-500 dark:bg-indigo-400',
+    primary: 'bg-cyan-500',
+    success: 'bg-emerald-500',
+    amber: 'bg-amber-500',
+    indigo: 'bg-purple-500',
+    teal: 'bg-teal-500',
   };
 
   return (
     <div id={id} className={`w-full ${className}`}>
       {(label || showPercent) && (
-        <div className="flex justify-between items-center text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+        <div className="flex justify-between items-center text-xs font-mono text-[var(--text-secondary)] mb-2">
           {label && <span>{label}</span>}
-          {showPercent && <span>{percentage}%</span>}
+          {showPercent && <span className="text-[var(--text-primary)]">{percentage}%</span>}
         </div>
       )}
-      <div className={`w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden ${heightClasses[size]}`}>
+      <div
+        className={`w-full bg-[var(--surface-secondary)] rounded-full overflow-hidden ${heightClasses[size]}`}
+      >
         <div
-          className={`h-full rounded-full transition-all duration-500 ease-out ${barColors[color]}`}
+          className={`h-full rounded-full transition-all duration-700 ease-out ${barColors[color]}`}
           style={{ width: `${percentage}%` }}
           role="progressbar"
           aria-valuenow={percentage}

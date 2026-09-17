@@ -1,103 +1,203 @@
 import { Link } from 'react-router-dom';
-import { Terminal, Fingerprint, Unlock, ArrowRight, ShieldCheck, Cpu } from 'lucide-react';
+import { Terminal, Fingerprint, Unlock, ArrowRight, Cpu, Zap, BookOpen, Target } from 'lucide-react';
 import { SecurityNotice } from '../../components/common/SecurityNotice';
 
 export function PlaygroundIndex() {
+  const hubs = [
+    {
+      to: '/playground/encrypt',
+      label: 'Encryption & Decryption',
+      desc: 'Test Caesar, Atbash, Vigenère, XOR, AES-GCM (128/256), and RSA-OAEP (2048). Inspect keys, IV nonces, and step-by-step character transformations.',
+      icon: Terminal,
+      accent: 'cyan',
+      accentBg: 'bg-cyan-500/10',
+      accentBorder: 'border-cyan-500/30',
+      accentText: 'text-cyan-400',
+      hoverBorder: 'hover:border-cyan-500/40',
+      cta: 'Launch Ciphers',
+      algorithms: ['Caesar', 'Atbash', 'Vigenère', 'XOR', 'AES-GCM', 'RSA-OAEP'],
+    },
+    {
+      to: '/playground/hash',
+      label: 'Hash Generator & Avalanche Lab',
+      desc: 'Compute real-time SHA-256 and SHA-512 cryptographic digests. Experiment with the Avalanche Effect by comparing two similar texts side-by-side.',
+      icon: Fingerprint,
+      accent: 'teal',
+      accentBg: 'bg-teal-500/10',
+      accentBorder: 'border-teal-500/30',
+      accentText: 'text-teal-400',
+      hoverBorder: 'hover:border-teal-500/40',
+      cta: 'Launch Hash Lab',
+      algorithms: ['SHA-256', 'SHA-512'],
+    },
+    {
+      to: '/playground/analyze',
+      label: 'Cryptanalysis Lab',
+      desc: 'Analyze statistical letter frequencies in ciphertext against English benchmarks, or crack Caesar substitution across all 25 parallel shifts.',
+      icon: Unlock,
+      accent: 'rose',
+      accentBg: 'bg-rose-500/10',
+      accentBorder: 'border-rose-500/30',
+      accentText: 'text-rose-400',
+      hoverBorder: 'hover:border-rose-500/40',
+      cta: 'Launch Analysis Tools',
+      algorithms: ['Frequency Analysis', 'Caesar Brute-Force'],
+    },
+  ];
+
   return (
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200">
+    <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in duration-200">
       {/* Header */}
-      <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-800/80 text-sky-700 dark:text-sky-300 text-xs font-semibold">
+      <div className="space-y-3 max-w-3xl">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
           <Terminal className="w-3.5 h-3.5" />
-          Interactive Cryptography Lab
+          <span className="tracking-wide uppercase text-[11px] font-medium">
+            Interactive Cryptography Lab
+          </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">
           Cryptography Playground
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-          Experiment directly with classical substitution ciphers, native browser Web Crypto API algorithms, cryptographic hashing, and cryptanalysis tools.
+        <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+          Experiment directly with classical substitution ciphers, native browser Web Crypto API
+          algorithms, cryptographic hashing, and cryptanalysis tools.
         </p>
       </div>
 
       <SecurityNotice type="general" />
 
-      {/* 3 Main Playground Hubs */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link
-          to="/playground/encrypt"
-          className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-sky-400 dark:hover:border-sky-600 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
-        >
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-sky-100 dark:bg-sky-950/80 border border-sky-200 dark:border-sky-800 flex items-center justify-center text-sky-600 dark:text-sky-400 group-hover:scale-105 transition-transform">
-              <Terminal className="w-6 h-6" />
-            </div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-              Encryption & Decryption
-            </h2>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Test Caesar, Atbash, Vigenère, XOR, AES-GCM (128/256), and RSA-OAEP (2048). Inspect keys, IV nonces, and step-by-step character transformations.
-            </p>
-          </div>
-          <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-sky-600 dark:text-sky-400">
-            <span>Launch Ciphers</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </div>
-        </Link>
+      {/* 3 Main Hubs */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {hubs.map(hub => {
+          const Icon = hub.icon;
+          return (
+            <Link
+              key={hub.to}
+              to={hub.to}
+              className={`group p-6 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] ${hub.hoverBorder} shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col justify-between`}
+            >
+              <div className="space-y-4">
+                <div
+                  className={`w-12 h-12 rounded-xl ${hub.accentBg} ${hub.accentBorder} border flex items-center justify-center ${hub.accentText} group-hover:scale-110 transition-transform duration-300`}
+                >
+                  <Icon className="w-6 h-6" />
+                </div>
+                <h2
+                  className={`text-lg font-bold text-[var(--text-primary)] group-hover:${hub.accentText} transition-colors`}
+                >
+                  {hub.label}
+                </h2>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  {hub.desc}
+                </p>
 
-        <Link
-          to="/playground/hash"
-          className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
-        >
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
-              <Fingerprint className="w-6 h-6" />
-            </div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-              Hash Generator & Avalanche Lab
-            </h2>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Compute real-time SHA-256 and SHA-512 cryptographic digests. Experiment with the Avalanche Effect by comparing two similar texts side-by-side.
-            </p>
-          </div>
-          <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-            <span>Launch Hash Lab</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </div>
-        </Link>
+                <div className="flex flex-wrap gap-1.5 pt-2">
+                  {hub.algorithms.map(a => (
+                    <span
+                      key={a}
+                      className={`px-2 py-0.5 rounded-md text-[10px] font-mono ${hub.accentBg} ${hub.accentBorder} border ${hub.accentText}`}
+                    >
+                      {a}
+                    </span>
+                  ))}
+                </div>
+              </div>
 
-        <Link
-          to="/playground/analyze"
-          className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-rose-400 dark:hover:border-rose-600 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
-        >
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform">
-              <Unlock className="w-6 h-6" />
-            </div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
-              Cryptanalysis Lab
-            </h2>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Analyze statistical letter frequencies in ciphertext against English benchmarks, or crack Caesar substitution across all 25 parallel shifts.
-            </p>
-          </div>
-          <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-rose-600 dark:text-rose-400">
-            <span>Launch Analysis Tools</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </div>
-        </Link>
+              <div
+                className={`pt-5 mt-5 border-t border-[var(--border-main)] flex items-center justify-between text-xs font-mono font-semibold ${hub.accentText}`}
+              >
+                <span>{hub.cta}</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
-      {/* Educational Web Crypto API Architecture Card */}
-      <div className="p-6 rounded-3xl bg-slate-900 text-slate-100 border border-slate-800 shadow-xs space-y-3">
-        <div className="flex items-center gap-2 text-sky-400">
-          <Cpu className="w-5 h-5" />
-          <h3 className="text-sm font-bold uppercase tracking-wider">
-            Powered by Browser Native Web Crypto API
-          </h3>
+      {/* Learning Path Strip */}
+      <div className="p-6 sm:p-7 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <Target className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-primary)]">
+              Suggested Learning Path
+            </h3>
+            <p className="text-[10px] font-mono text-[var(--text-secondary)]">
+              Recommended order for beginners
+            </p>
+          </div>
         </div>
-        <p className="text-xs text-slate-300 leading-relaxed">
-          Modern cryptographic algorithms in ChiperLab (AES-GCM, RSA-OAEP, SHA-256, SHA-512) are executed using the native browser W3C <code className="text-sky-300 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">window.crypto.subtle</code> interface. All key generation, padding, and authenticated tag checks happen inside hardware-accelerated sandboxed memory.
-        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          {[
+            { step: '01', title: 'Learn Basics', desc: 'Read the 12 fundamentals', link: '/learn/fundamentals' },
+            { step: '02', title: 'Try Ciphers', desc: 'Encrypt & decrypt classics', link: '/playground/encrypt' },
+            { step: '03', title: 'Explore Hashing', desc: 'SHA-256 & avalanche lab', link: '/playground/hash' },
+            { step: '04', title: 'Break Ciphers', desc: 'Cryptanalysis & puzzles', link: '/playground/analyze' },
+          ].map((s, i) => (
+            <Link
+              key={s.step}
+              to={s.link}
+              className="group relative p-4 rounded-xl bg-[var(--surface-secondary)] border border-[var(--border-main)] hover:border-cyan-500/40 transition-colors"
+            >
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="w-7 h-7 rounded-md bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center font-mono text-[10px] font-bold text-cyan-400">
+                  {s.step}
+                </span>
+                <span className="text-xs font-bold text-[var(--text-primary)] group-hover:text-cyan-400 transition-colors">
+                  {s.title}
+                </span>
+              </div>
+              <p className="text-[11px] text-[var(--text-secondary)]">{s.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Web Crypto Info Card */}
+      <div className="p-6 sm:p-7 rounded-2xl bg-[#0A0C10] border border-[var(--border-main)] shadow-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="lg:col-span-2 space-y-3">
+            <div className="flex items-center gap-2.5 text-cyan-400">
+              <div className="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
+                <Cpu className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider">
+                Powered by Browser Native Web Crypto API
+              </h3>
+            </div>
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+              Modern cryptographic algorithms in ChiperLab (AES-GCM, RSA-OAEP, SHA-256, SHA-512)
+              are executed using the native browser W3C{' '}
+              <code className="text-cyan-300 bg-[#12151B] px-2 py-0.5 rounded border border-[#1E222B] font-mono text-xs">
+                window.crypto.subtle
+              </code>{' '}
+              interface. All key generation, padding, and authenticated tag checks happen inside
+              hardware-accelerated sandboxed memory.
+            </p>
+          </div>
+
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-2 text-[11px] font-mono text-[var(--text-secondary)]">
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              <span>Zero network round-trips</span>
+            </div>
+            <div className="flex items-center gap-2 text-[11px] font-mono text-[var(--text-secondary)]">
+              <Zap className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Hardware-accelerated AES-NI</span>
+            </div>
+            <div className="flex items-center gap-2 text-[11px] font-mono text-[var(--text-secondary)]">
+              <Zap className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Sandboxed memory isolation</span>
+            </div>
+            <div className="flex items-center gap-2 text-[11px] font-mono text-[var(--text-secondary)]">
+              <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+              <span>W3C standardized</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

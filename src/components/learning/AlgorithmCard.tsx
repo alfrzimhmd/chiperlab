@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Lock, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { AlgorithmDetail } from '../../data/algorithms';
 import { Badge } from '../common/Badge';
 
@@ -19,10 +19,10 @@ export function AlgorithmCard({ algorithm, isExplored = false }: AlgorithmCardPr
   return (
     <div
       id={`algorithm-card-${algorithm.id}`}
-      className="group relative flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-sky-300 dark:hover:border-sky-700/80 shadow-xs hover:shadow-md transition-all duration-200 text-left"
+      className="group relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] hover:border-cyan-500/40 shadow-lg hover:shadow-xl transition-all duration-300 text-left"
     >
       <div>
-        <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
             <Badge variant={categoryBadge.variant} size="sm">
               {categoryBadge.label}
@@ -41,42 +41,41 @@ export function AlgorithmCard({ algorithm, isExplored = false }: AlgorithmCardPr
             </Badge>
           </div>
           {isExplored && (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-emerald-400">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              Explored
+              EXPLORED
             </span>
           )}
         </div>
 
-        <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors mb-1">
+        <h3 className="text-base font-bold text-[var(--text-primary)] group-hover:text-cyan-400 transition-colors mb-1.5">
           {algorithm.name}
         </h3>
-        <p className="text-xs font-medium text-sky-600 dark:text-sky-400 mb-2">
+        <p className="text-xs font-mono font-medium text-cyan-400 mb-2">
           {algorithm.tagline}
         </p>
-        <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mb-4">
+        <p className="text-xs text-[var(--text-secondary)] line-clamp-2 leading-relaxed mb-4">
           {algorithm.description}
         </p>
 
-        {/* Formula preview */}
-        <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 font-mono text-[11px] text-slate-700 dark:text-slate-300 truncate mb-4">
-          <span className="text-slate-400 dark:text-slate-500 mr-1.5">ENC:</span>
+        <div className="p-3 rounded-lg bg-[var(--surface-secondary)] border border-[var(--border-main)] font-mono text-[11px] text-[var(--text-primary)] truncate mb-4">
+          <span className="text-[var(--text-secondary)] mr-1.5">ENC:</span>
           {algorithm.formula.encryption}
         </div>
       </div>
 
-      <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
+      <div className="pt-4 border-t border-[var(--border-main)] flex items-center justify-between text-xs">
         <Link
           to={`/learn/algorithms/${algorithm.id}`}
-          className="text-slate-700 dark:text-slate-200 hover:text-sky-600 dark:hover:text-sky-400 font-semibold"
+          className="text-[var(--text-primary)] hover:text-cyan-400 font-mono font-semibold transition-colors"
         >
-          Algorithm Details
+          Details
         </Link>
         <Link
           to={algorithm.playgroundRoute}
-          className="text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-1 hover:underline"
+          className="text-cyan-400 font-mono font-semibold flex items-center gap-1 hover:text-cyan-300"
         >
-          Try in Playground <ArrowRight className="w-3.5 h-3.5" />
+          Try <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
     </div>

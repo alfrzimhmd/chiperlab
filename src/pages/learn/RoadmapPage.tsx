@@ -1,19 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ROADMAP_LEVELS } from '../../data/roadmap';
 import { useProgress } from '../../hooks/useProgress';
-import {
-  Compass,
-  CheckCircle2,
-  Lock,
-  ArrowRight,
-  Clock,
-  Zap,
-  Shield,
-  Key,
-  Fingerprint,
-  Terminal,
-  Share2,
-} from 'lucide-react';
+import { Compass, CheckCircle2, ArrowRight, Clock, Zap } from 'lucide-react';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 
@@ -29,30 +17,36 @@ export function RoadmapPage() {
       return { status: 'Completed', color: 'success' as const };
     }
     if (completedCount > 0) {
-      return { status: `In Progress (${completedCount}/${requiredLessonIds.length})`, color: 'primary' as const };
+      return {
+        status: `In Progress (${completedCount}/${requiredLessonIds.length})`,
+        color: 'primary' as const,
+      };
     }
     return { status: 'Available', color: 'neutral' as const };
   };
 
   return (
-    <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200">
+    <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in duration-200">
       {/* Header */}
-      <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-800/80 text-amber-700 dark:text-amber-300 text-xs font-semibold">
+      <div className="space-y-3 max-w-2xl">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border border-amber-500/30 bg-amber-500/10 text-amber-400">
           <Compass className="w-3.5 h-3.5" />
-          Interactive Learning Path
+          <span className="tracking-wide uppercase text-[11px] font-medium">
+            Interactive Learning Path
+          </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">
           7-Level Cryptography Roadmap
         </h1>
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-          A structured, non-overwhelming step-by-step path from fundamental definitions to advanced asymmetric key exchange and cryptanalysis attacks.
+        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+          A structured, non-overwhelming step-by-step path from fundamental definitions to
+          advanced asymmetric key exchange and cryptanalysis attacks.
         </p>
       </div>
 
-      {/* Roadmap Tree Container */}
-      <div className="relative space-y-6 before:absolute before:inset-0 before:left-8 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800 before:hidden sm:before:block">
-        {ROADMAP_LEVELS.map((level, idx) => {
+      {/* Roadmap Tree */}
+      <div className="relative space-y-5 before:absolute before:inset-0 before:left-8 before:w-0.5 before:bg-[var(--border-main)] before:hidden sm:before:block">
+        {ROADMAP_LEVELS.map(level => {
           const { status, color } = getLevelStatus(level.requiredLessonIds);
           const isCompleted = status === 'Completed';
 
@@ -60,78 +54,80 @@ export function RoadmapPage() {
             <div
               key={level.levelCode}
               id={`roadmap-node-${level.levelNumber}`}
-              className="relative flex flex-col sm:flex-row items-start gap-4 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition-all duration-200"
+              className="relative flex flex-col sm:flex-row items-start gap-5 p-6 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] hover:border-cyan-500/40 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              {/* Level Indicator Pill / Icon */}
+              {/* Level Indicator */}
               <div
                 className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 font-bold text-sm z-10 transition-colors ${
                   isCompleted
-                    ? 'bg-emerald-500 text-white shadow-md'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-[var(--surface-secondary)] text-[var(--text-primary)] border border-[var(--border-main)]'
                 }`}
               >
                 {isCompleted ? (
                   <CheckCircle2 className="w-6 h-6" />
                 ) : (
-                  <span className="font-mono">0{level.levelNumber}</span>
+                  <span className="font-mono">
+                    {String(level.levelNumber).padStart(2, '0')}
+                  </span>
                 )}
               </div>
 
-              {/* Content Body */}
-              <div className="flex-1 space-y-3">
+              {/* Content */}
+              <div className="flex-1 space-y-3 min-w-0">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-sky-600 dark:text-sky-400 uppercase">
+                    <span className="font-mono text-xs font-bold text-cyan-400 uppercase">
                       {level.levelCode}
                     </span>
                     <Badge variant={color} size="sm">
                       {status}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center gap-3 text-xs font-mono text-[var(--text-secondary)]">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {level.estimatedTime}
                     </span>
-                    <span className="text-amber-600 dark:text-amber-400 font-semibold flex items-center gap-1">
-                      <Zap className="w-3 h-3" />
+                    <span className="text-amber-400 font-semibold flex items-center gap-1">
+                      <Zap className="w-3 h-3 fill-amber-400" />
                       +{level.xpReward} XP
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
                     {level.title}
                   </h3>
-                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs font-mono text-[var(--text-secondary)] mt-0.5">
                     {level.subtitle}
                   </p>
                 </div>
 
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                   {level.description}
                 </p>
 
                 {/* Objectives */}
-                <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block">
-                    Core Learning Objectives:
+                <div className="space-y-2 pt-3 border-t border-[var(--border-main)]">
+                  <span className="text-[10px] font-mono font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                    Core Learning Objectives
                   </span>
-                  <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
+                  <ul className="space-y-1.5 text-xs text-[var(--text-secondary)]">
                     {level.objectives.map((obj, oIdx) => (
-                      <li key={oIdx} className="flex items-center gap-2">
-                        <span className="w-1 h-1 rounded-full bg-sky-500 shrink-0" />
-                        <span>{obj}</span>
+                      <li key={oIdx} className="flex items-start gap-2">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400 mt-1.5 shrink-0" />
+                        <span className="leading-relaxed">{obj}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Footer Action */}
-                <div className="pt-2 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-400">
-                    Featured: {level.algorithms.join(', ')}
+                {/* Footer */}
+                <div className="pt-3 flex items-center justify-between flex-wrap gap-2">
+                  <span className="text-[10px] font-mono text-[var(--text-secondary)]">
+                    {level.algorithms.join(' · ')}
                   </span>
                   <Link to={level.route}>
                     <Button

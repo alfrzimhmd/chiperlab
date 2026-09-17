@@ -1,5 +1,21 @@
 export type ThemeMode = 'light' | 'dark' | 'system';
 
+export type ActivityType =
+  | 'lesson-complete'
+  | 'algorithm-explored'
+  | 'challenge-complete'
+  | 'quiz-attempt'
+  | 'achievement-unlocked';
+
+export interface ActivityLog {
+  id: string;
+  type: ActivityType;
+  label: string;
+  detail?: string;
+  xp: number;
+  timestamp: number;
+}
+
 export interface Achievement {
   id: string;
   title: string;
@@ -20,4 +36,5 @@ export interface UserProgress {
   lastVisitedLesson?: string;
   theme: ThemeMode;
   totalXp: number;
+  activityLog?: ActivityLog[];
 }

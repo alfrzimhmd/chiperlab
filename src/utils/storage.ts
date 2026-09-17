@@ -11,6 +11,7 @@ export const DEFAULT_PROGRESS: UserProgress = {
   achievements: [],
   theme: 'system',
   totalXp: 0,
+  activityLog: [],
 };
 
 export function getStoredProgress(): UserProgress {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   caesarEncrypt,
@@ -35,16 +35,80 @@ import {
   Copy,
   Check,
   RotateCcw,
-  Sparkles,
   Key,
   Lock,
   Unlock,
   Shield,
   Clock,
   ArrowRightLeft,
+  Info,
+  Cpu,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 
 type SupportedAlgo = 'caesar' | 'atbash' | 'vigenere' | 'xor' | 'aes-gcm' | 'rsa-oaep';
+
+const ALGO_INFO: Record<
+  SupportedAlgo,
+  {
+    title: string;
+    type: 'Classical' | 'Modern';
+    strength: 'Educational' | 'Weak' | 'Strong' | 'Industry';
+    keyspace: string;
+    description: string;
+    highlights: string[];
+  }
+> = {
+  caesar: {
+    title: 'Caesar Cipher',
+    type: 'Classical',
+    strength: 'Educational',
+    keyspace: '25 shifts',
+    description: 'Ancient monoalphabetic shift cipher used by Julius Caesar.',
+    highlights: ['Simple substitution', 'Trivially brute-forced', 'Frequency leaks'],
+  },
+  atbash: {
+    title: 'Atbash Cipher',
+    type: 'Classical',
+    strength: 'Educational',
+    keyspace: 'No key (fixed)',
+    description: 'Hebrew mirror cipher mapping A↔Z, B↔Y, C↔X.',
+    highlights: ['Self-inverting', 'No secret key', 'Zero confidentiality'],
+  },
+  vigenere: {
+    title: 'Vigenère Cipher',
+    type: 'Classical',
+    strength: 'Weak',
+    keyspace: '26^(key length)',
+    description: 'Polyalphabetic cipher once called "le chiffre indéchiffrable".',
+    highlights: ['Keyword-driven', 'Masks frequency', 'Kasiski-vulnerable'],
+  },
+  xor: {
+    title: 'XOR Stream',
+    type: 'Classical',
+    strength: 'Weak',
+    keyspace: 'Repeating key',
+    description: 'Bitwise exclusive-OR — the primitive of all modern ciphers.',
+    highlights: ['Involutory', 'Two-Time Pad vulnerable', 'Foundation of AES'],
+  },
+  'aes-gcm': {
+    title: 'AES-GCM',
+    type: 'Modern',
+    strength: 'Industry',
+    keyspace: '2^128 or 2^256',
+    description: 'US federal standard for authenticated symmetric encryption.',
+    highlights: ['AEAD cipher', 'Hardware accelerated', 'Nonce must never repeat'],
+  },
+  'rsa-oaep': {
+    title: 'RSA-OAEP',
+    type: 'Modern',
+    strength: 'Strong',
+    keyspace: '2^2048 (factoring)',
+    description: 'Public-key asymmetric encryption based on prime factorization.',
+    highlights: ['Key exchange ready', 'OAEP-padded', 'Quantum-vulnerable'],
+  },
+};
 
 export function EncryptPlayground() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -54,41 +118,37 @@ export function EncryptPlayground() {
   const [selectedAlgo, setSelectedAlgo] = useState<SupportedAlgo>(algoParam || 'caesar');
   const [mode, setMode] = useState<'encrypt' | 'decrypt'>('encrypt');
 
-  // Input text
   const [inputText, setInputText] = useState('DEFEND THE EAST WALL');
   const [result, setResult] = useState<CryptoResult | null>(null);
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Algorithm-specific state
   const [caesarShift, setCaesarShift] = useState<number>(3);
   const [vigenereKey, setVigenereKey] = useState<string>('CIPHER');
   const [xorKey, setXorKey] = useState<string>('SECRET');
 
-  // AES state
   const [aesKeyHex, setAesKeyHex] = useState<string>('');
   const [aesIvHex, setAesIvHex] = useState<string>('');
   const [aesBitLength, setAesBitLength] = useState<128 | 256>(256);
 
-  // RSA state
   const [rsaPublicKeyPem, setRsaPublicKeyPem] = useState<string>('');
   const [rsaPrivateKeyPem, setRsaPrivateKeyPem] = useState<string>('');
   const [isGeneratingRsa, setIsGeneratingRsa] = useState(false);
 
-  // Sync with searchParams
   useEffect(() => {
-    if (algoParam && ['caesar', 'atbash', 'vigenere', 'xor', 'aes-gcm', 'rsa-oaep'].includes(algoParam)) {
+    if (
+      algoParam &&
+      ['caesar', 'atbash', 'vigenere', 'xor', 'aes-gcm', 'rsa-oaep'].includes(algoParam)
+    ) {
       setSelectedAlgo(algoParam);
     }
   }, [algoParam]);
 
-  // Track algorithm exploration in progress
   useEffect(() => {
     exploreAlgorithm(selectedAlgo);
   }, [selectedAlgo, exploreAlgorithm]);
 
-  // Generate initial AES key on mount
   useEffect(() => {
     async function initAes() {
       try {
@@ -103,7 +163,6 @@ export function EncryptPlayground() {
     }
   }, [selectedAlgo, aesBitLength, aesKeyHex]);
 
-  // Main compute handler
   useEffect(() => {
     let isMounted = true;
 
@@ -119,21 +178,25 @@ export function EncryptPlayground() {
         let res: CryptoResult;
 
         if (selectedAlgo === 'caesar') {
-          res = mode === 'encrypt'
-            ? caesarEncrypt(inputText, caesarShift)
-            : caesarDecrypt(inputText, caesarShift);
+          res =
+            mode === 'encrypt'
+              ? caesarEncrypt(inputText, caesarShift)
+              : caesarDecrypt(inputText, caesarShift);
         } else if (selectedAlgo === 'atbash') {
-          res = mode === 'encrypt'
-            ? atbashEncrypt(inputText)
-            : atbashDecrypt(inputText);
+          res =
+            mode === 'encrypt'
+              ? atbashEncrypt(inputText)
+              : atbashDecrypt(inputText);
         } else if (selectedAlgo === 'vigenere') {
-          res = mode === 'encrypt'
-            ? vigenereEncrypt(inputText, vigenereKey)
-            : vigenereDecrypt(inputText, vigenereKey);
+          res =
+            mode === 'encrypt'
+              ? vigenereEncrypt(inputText, vigenereKey)
+              : vigenereDecrypt(inputText, vigenereKey);
         } else if (selectedAlgo === 'xor') {
-          res = mode === 'encrypt'
-            ? xorEncrypt(inputText, xorKey, 'hex')
-            : xorDecrypt(inputText, xorKey, 'hex');
+          res =
+            mode === 'encrypt'
+              ? xorEncrypt(inputText, xorKey, 'hex')
+              : xorDecrypt(inputText, xorKey, 'hex');
         } else if (selectedAlgo === 'aes-gcm') {
           if (!aesKeyHex) {
             setErrorMessage('Please generate or provide an AES hex key.');
@@ -171,23 +234,18 @@ export function EncryptPlayground() {
           return;
         }
 
-        if (isMounted) {
-          setResult(res);
-        }
+        if (isMounted) setResult(res);
       } catch (err: any) {
         if (isMounted) {
           setErrorMessage(err?.message || 'Cryptographic operation failed');
           setResult(null);
         }
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     }
 
     runCrypto();
-
     return () => {
       isMounted = false;
     };
@@ -247,101 +305,123 @@ export function EncryptPlayground() {
   };
 
   const isClassical = ['caesar', 'atbash', 'vigenere', 'xor'].includes(selectedAlgo);
+  const hasSteps = isClassical && result && result.steps && result.steps.length > 0;
+  const algoInfo = ALGO_INFO[selectedAlgo];
+
+  const algorithmPills = [
+    { id: 'caesar', label: 'Caesar' },
+    { id: 'atbash', label: 'Atbash' },
+    { id: 'vigenere', label: 'Vigenère' },
+    { id: 'xor', label: 'XOR' },
+    { id: 'aes-gcm', label: 'AES-GCM' },
+    { id: 'rsa-oaep', label: 'RSA-OAEP' },
+  ] as const;
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-in fade-in duration-200">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-800/80 text-sky-700 dark:text-sky-300 text-xs font-semibold mb-2">
-            <Lock className="w-3.5 h-3.5" />
+    <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in duration-200">
+      {/* ============================================================
+          HEADER
+      ============================================================ */}
+      <div className="space-y-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
+          <Lock className="w-3.5 h-3.5" />
+          <span className="tracking-wide uppercase text-[11px] font-medium">
             Encryption & Decryption Engine
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Cryptographic Playground
-          </h1>
+          </span>
         </div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">
+              Cryptographic Playground
+            </h1>
+            <p className="text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+              Test 6 ciphers — from ancient Caesar shifts to modern Web Crypto authenticated
+              encryption.
+            </p>
+          </div>
 
-        {/* Mode Toggle: Encrypt vs Decrypt */}
-        <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-fit">
-          <button
-            id="mode-toggle-encrypt"
-            type="button"
-            onClick={() => setMode('encrypt')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-              mode === 'encrypt'
-                ? 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Lock className="w-3.5 h-3.5" />
-            Encrypt
-          </button>
-          <button
-            id="mode-toggle-decrypt"
-            type="button"
-            onClick={() => setMode('decrypt')}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-              mode === 'decrypt'
-                ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Unlock className="w-3.5 h-3.5" />
-            Decrypt
-          </button>
+          <div className="flex items-center p-1 rounded-xl bg-[var(--surface-secondary)] border border-[var(--border-main)] w-fit">
+            <button
+              id="mode-toggle-encrypt"
+              type="button"
+              onClick={() => setMode('encrypt')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer ${
+                mode === 'encrypt'
+                  ? 'bg-cyan-500 text-black'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <Lock className="w-3.5 h-3.5" />
+              Encrypt
+            </button>
+            <button
+              id="mode-toggle-decrypt"
+              type="button"
+              onClick={() => setMode('decrypt')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer ${
+                mode === 'decrypt'
+                  ? 'bg-emerald-500 text-black'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <Unlock className="w-3.5 h-3.5" />
+              Decrypt
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Security Warning Notice */}
       <SecurityNotice type={isClassical ? 'classical' : 'general'} />
 
-      {/* Algorithm Selector Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase shrink-0 mr-1">
-          Algorithm:
+      {/* ============================================================
+          ALGORITHM SELECTOR
+      ============================================================ */}
+      <div className="space-y-2">
+        <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+          Select Algorithm
         </span>
-        {[
-          { id: 'caesar', label: 'Caesar Cipher', category: 'Classical' },
-          { id: 'atbash', label: 'Atbash Cipher', category: 'Classical' },
-          { id: 'vigenere', label: 'Vigenère Cipher', category: 'Classical' },
-          { id: 'xor', label: 'XOR Cipher', category: 'Classical' },
-          { id: 'aes-gcm', label: 'AES-GCM', category: 'Modern' },
-          { id: 'rsa-oaep', label: 'RSA-OAEP', category: 'Modern' },
-        ].map(item => (
-          <button
-            key={item.id}
-            id={`select-algo-${item.id}`}
-            type="button"
-            onClick={() => handleSelectAlgo(item.id as SupportedAlgo)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${
-              selectedAlgo === item.id
-                ? 'bg-sky-600 text-white dark:bg-sky-500 shadow-xs'
-                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
-            }`}
-          >
-            <span>{item.label}</span>
-          </button>
-        ))}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {algorithmPills.map(item => (
+            <button
+              key={item.id}
+              id={`select-algo-${item.id}`}
+              type="button"
+              onClick={() => handleSelectAlgo(item.id as SupportedAlgo)}
+              className={`px-4 py-2 rounded-lg text-xs font-mono font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                selectedAlgo === item.id
+                  ? 'bg-cyan-500 text-black'
+                  : 'bg-[var(--surface-main)] border border-[var(--border-main)] text-[var(--text-secondary)] hover:border-cyan-500/40 hover:text-[var(--text-primary)]'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Main Interactive Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column: Input & Key Controls */}
-        <div className="space-y-5">
-          {/* Text Input Card */}
-          <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+      {/* ============================================================
+          MAIN GRID
+          LEFT (7 cols):  Input → Config → Output
+          RIGHT (5 cols): Step Visualizer (sticky)
+      ============================================================ */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* ============================================================
+            LEFT COLUMN: Input + Config + Output
+        ============================================================ */}
+        <div className="lg:col-span-7 space-y-5">
+          {/* 1. INPUT */}
+          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg space-y-3">
             <div className="flex items-center justify-between">
               <label
                 htmlFor="crypto-input-text"
-                className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300"
+                className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)]"
               >
-                {mode === 'encrypt' ? 'Input Plaintext' : 'Input Ciphertext'}
+                {mode === 'encrypt' ? '01 — Input Plaintext' : '01 — Input Ciphertext'}
               </label>
               <button
                 type="button"
                 onClick={() => setInputText('')}
-                className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3 h-3" /> Clear
               </button>
@@ -357,30 +437,44 @@ export function EncryptPlayground() {
                   ? 'Enter secret message to encrypt...'
                   : 'Enter ciphertext (or hex bytes) to decrypt...'
               }
-              className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-mono text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-y"
+              className="w-full p-4 rounded-xl border border-[var(--border-main)] bg-[var(--surface-secondary)] font-mono text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 resize-y"
             />
 
-            <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono">
+            <div className="flex items-center justify-between text-[11px] font-mono text-[var(--text-secondary)]">
               <span>{inputText.length} characters</span>
               <span>UTF-8 encoded</span>
             </div>
           </div>
 
-          {/* Key & Parameter Controls Card */}
-          <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs uppercase tracking-wider">
-              <Key className="w-4 h-4 text-sky-500" />
-              <span>Key & Cipher Configuration</span>
+          {/* 2. CONFIG */}
+          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg space-y-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <Key className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-primary)]">
+                  02 — Configuration
+                </h3>
+                <p className="text-[10px] font-mono text-[var(--text-secondary)]">
+                  {selectedAlgo === 'caesar' && 'Shift parameter'}
+                  {selectedAlgo === 'atbash' && 'Self-inverting, no key required'}
+                  {selectedAlgo === 'vigenere' && 'Alphabetical keyword'}
+                  {selectedAlgo === 'xor' && 'XOR secret key'}
+                  {selectedAlgo === 'aes-gcm' && 'AES symmetric key + IV nonce'}
+                  {selectedAlgo === 'rsa-oaep' && 'RSA public/private key pair'}
+                </p>
+              </div>
             </div>
 
-            {/* Caesar controls */}
+            {/* Caesar */}
             {selectedAlgo === 'caesar' && (
               <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-600 dark:text-slate-300 font-medium">
-                    Alphabet Shift Distance: <strong className="font-mono text-sky-600 dark:text-sky-400 font-bold">{caesarShift}</strong>
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-[var(--text-secondary)]">
+                    Shift: <strong className="text-cyan-400 font-bold">{caesarShift}</strong>
                   </span>
-                  <span className="text-[11px] text-slate-400 font-mono">Modulo 26</span>
+                  <span className="text-[10px] text-[var(--text-secondary)]">Modulo 26</span>
                 </div>
                 <input
                   type="range"
@@ -388,9 +482,9 @@ export function EncryptPlayground() {
                   max="25"
                   value={caesarShift}
                   onChange={e => setCaesarShift(Number(e.target.value))}
-                  className="w-full accent-sky-500 cursor-pointer"
+                  className="w-full accent-cyan-500 cursor-pointer"
                 />
-                <div className="flex justify-between text-[10px] font-mono text-slate-400">
+                <div className="flex justify-between text-[10px] font-mono text-[var(--text-secondary)]">
                   <span>Shift 1 (A→B)</span>
                   <span>Shift 13 (ROT13)</span>
                   <span>Shift 25 (A→Z)</span>
@@ -398,33 +492,39 @@ export function EncryptPlayground() {
               </div>
             )}
 
-            {/* Atbash controls */}
+            {/* Atbash */}
             {selectedAlgo === 'atbash' && (
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 text-xs text-slate-600 dark:text-slate-300 leading-relaxed border border-slate-200 dark:border-slate-800">
-                <strong>Self-Inverting Involutory Cipher:</strong> Atbash requires no key. It maps the 1st letter of the alphabet to the 26th (A↔Z, B↔Y, C↔X). Running the algorithm twice automatically decrypts the message.
+              <div className="p-4 rounded-xl bg-[var(--surface-secondary)] border border-[var(--border-main)] text-xs text-[var(--text-secondary)] leading-relaxed">
+                <strong className="text-[var(--text-primary)]">
+                  Self-Inverting Involutory Cipher:
+                </strong>{' '}
+                Atbash requires no key. It maps the 1st letter of the alphabet to the 26th (A↔Z,
+                B↔Y, C↔X). Running the algorithm twice automatically decrypts the message.
               </div>
             )}
 
-            {/* Vigenère controls */}
+            {/* Vigenère */}
             {selectedAlgo === 'vigenere' && (
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-600 dark:text-slate-300 block">
-                  Alphabetical Secret Keyword:
+              <div className="space-y-3">
+                <label className="text-xs font-mono text-[var(--text-secondary)] block">
+                  Alphabetical Secret Keyword
                 </label>
                 <input
                   type="text"
                   value={vigenereKey}
-                  onChange={e => setVigenereKey(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
+                  onChange={e =>
+                    setVigenereKey(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())
+                  }
                   placeholder="e.g. CIPHER"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-mono text-xs uppercase tracking-wider text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-4 py-2.5 rounded-lg border border-[var(--border-main)] bg-[var(--surface-secondary)] font-mono text-sm uppercase tracking-wider text-[var(--text-primary)] focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
                 />
-                <div className="flex gap-2 pt-1">
+                <div className="flex flex-wrap gap-2">
                   {['KEY', 'CIPHER', 'SECRET', 'CRYPTO'].map(kw => (
                     <button
                       key={kw}
                       type="button"
                       onClick={() => setVigenereKey(kw)}
-                      className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-mono text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                      className="px-2.5 py-1 rounded-md bg-[var(--surface-secondary)] border border-[var(--border-main)] text-[10px] font-mono text-[var(--text-secondary)] hover:border-cyan-500/40 hover:text-cyan-400 transition-colors cursor-pointer"
                     >
                       {kw}
                     </button>
@@ -433,65 +533,97 @@ export function EncryptPlayground() {
               </div>
             )}
 
-            {/* XOR controls */}
+            {/* XOR */}
             {selectedAlgo === 'xor' && (
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-600 dark:text-slate-300 block">
-                  XOR Secret Key String:
+              <div className="space-y-3">
+                <label className="text-xs font-mono text-[var(--text-secondary)] block">
+                  XOR Secret Key String
                 </label>
                 <input
                   type="text"
                   value={xorKey}
                   onChange={e => setXorKey(e.target.value)}
                   placeholder="Enter secret key string..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-mono text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-4 py-2.5 rounded-lg border border-[var(--border-main)] bg-[var(--surface-secondary)] font-mono text-sm text-[var(--text-primary)] focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20"
                 />
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] font-mono text-[var(--text-secondary)]">
                   Output is formatted as space-separated Hexadecimal bytes.
                 </p>
               </div>
             )}
 
-            {/* AES-GCM controls */}
+            {/* AES-GCM */}
             {selectedAlgo === 'aes-gcm' && (
-              <div className="space-y-3 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-slate-700 dark:text-slate-300">
-                    AES Key ({aesBitLength}-bit):
+              <div className="space-y-4 text-xs">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <span className="font-mono text-[var(--text-secondary)]">
+                    AES Key ({aesBitLength}-bit)
                   </span>
-                  <Button size="sm" variant="outline" onClick={handleGenerateNewAesKey}>
-                    Generate Key
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center p-0.5 rounded-lg bg-[var(--surface-secondary)] border border-[var(--border-main)]">
+                      <button
+                        type="button"
+                        onClick={() => setAesBitLength(128)}
+                        className={`px-2.5 py-1 rounded-md text-[10px] font-mono font-bold cursor-pointer transition-colors ${
+                          aesBitLength === 128
+                            ? 'bg-cyan-500 text-black'
+                            : 'text-[var(--text-secondary)]'
+                        }`}
+                      >
+                        128
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAesBitLength(256)}
+                        className={`px-2.5 py-1 rounded-md text-[10px] font-mono font-bold cursor-pointer transition-colors ${
+                          aesBitLength === 256
+                            ? 'bg-cyan-500 text-black'
+                            : 'text-[var(--text-secondary)]'
+                        }`}
+                      >
+                        256
+                      </button>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={handleGenerateNewAesKey}>
+                      Regenerate
+                    </Button>
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  value={aesKeyHex}
-                  onChange={e => setAesKeyHex(e.target.value)}
-                  placeholder="AES Hex Key..."
-                  className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-mono text-[11px] text-slate-900 dark:text-white"
-                />
 
-                <div className="space-y-1">
-                  <span className="font-medium text-slate-700 dark:text-slate-300 block">
-                    12-byte IV Nonce (Hex):
-                  </span>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] block">
+                    Hex Key
+                  </label>
+                  <input
+                    type="text"
+                    value={aesKeyHex}
+                    onChange={e => setAesKeyHex(e.target.value)}
+                    placeholder="AES Hex Key..."
+                    className="w-full px-3 py-2 rounded-lg border border-[var(--border-main)] bg-[var(--surface-secondary)] font-mono text-[11px] text-[var(--text-primary)] focus:outline-none focus:border-cyan-500/50"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] block">
+                    12-byte IV Nonce (Hex)
+                  </label>
                   <input
                     type="text"
                     value={aesIvHex}
                     onChange={e => setAesIvHex(e.target.value)}
                     placeholder="Auto-generated on encryption..."
-                    className="w-full px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-mono text-[11px] text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2 rounded-lg border border-[var(--border-main)] bg-[var(--surface-secondary)] font-mono text-[11px] text-[var(--text-primary)] focus:outline-none focus:border-cyan-500/50"
                   />
                 </div>
               </div>
             )}
 
-            {/* RSA-OAEP controls */}
+            {/* RSA-OAEP */}
             {selectedAlgo === 'rsa-oaep' && (
-              <div className="space-y-3 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-slate-700 dark:text-slate-300">
-                    RSA 2048-bit Key Pair:
+              <div className="space-y-4 text-xs">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <span className="font-mono text-[var(--text-secondary)]">
+                    RSA 2048-bit Key Pair
                   </span>
                   <Button
                     size="sm"
@@ -503,45 +635,42 @@ export function EncryptPlayground() {
                   </Button>
                 </div>
 
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
-                      Public Key (Used for Encryption)
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-400 block mb-1.5">
+                      Public Key (Encrypt)
                     </span>
                     <textarea
                       rows={3}
                       value={rsaPublicKeyPem}
                       onChange={e => setRsaPublicKeyPem(e.target.value)}
-                      placeholder="Click 'Generate Keypair' to create RSA keys..."
-                      className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-mono text-[10px]"
+                      placeholder="Click 'Generate Keypair'..."
+                      className="w-full p-3 rounded-lg border border-[var(--border-main)] bg-[var(--surface-secondary)] font-mono text-[10px] text-[var(--text-primary)] focus:outline-none focus:border-cyan-500/50 resize-y"
                     />
                   </div>
 
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
-                      Private Key (Used for Decryption)
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400 block mb-1.5">
+                      Private Key (Decrypt)
                     </span>
                     <textarea
                       rows={3}
                       value={rsaPrivateKeyPem}
                       onChange={e => setRsaPrivateKeyPem(e.target.value)}
-                      placeholder="Click 'Generate Keypair' to create RSA keys..."
-                      className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-mono text-[10px]"
+                      placeholder="Click 'Generate Keypair'..."
+                      className="w-full p-3 rounded-lg border border-[var(--border-main)] bg-[var(--surface-secondary)] font-mono text-[10px] text-[var(--text-primary)] focus:outline-none focus:border-cyan-500/50 resize-y"
                     />
                   </div>
                 </div>
               </div>
             )}
           </div>
-        </div>
 
-        {/* Right Column: Output & Details */}
-        <div className="space-y-5">
-          {/* Output Card */}
-          <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                {mode === 'encrypt' ? 'Ciphertext Output' : 'Decrypted Plaintext Output'}
+          {/* 3. OUTPUT */}
+          <div className="p-5 sm:p-6 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                {mode === 'encrypt' ? '03 — Ciphertext Output' : '03 — Decrypted Plaintext'}
               </span>
 
               <div className="flex items-center gap-2">
@@ -549,61 +678,73 @@ export function EncryptPlayground() {
                   type="button"
                   onClick={handleSwapOutputToInput}
                   disabled={!result?.output}
-                  className="text-xs text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1 disabled:opacity-40 cursor-pointer"
+                  className="text-[11px] font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
                 >
-                  <ArrowRightLeft className="w-3 h-3" /> Swap to Input
+                  <ArrowRightLeft className="w-3 h-3" /> Swap
                 </button>
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={handleCopy}
                   disabled={!result?.output}
-                  icon={copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                  icon={
+                    copied ? (
+                      <Check className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3 h-3" />
+                    )
+                  }
                 >
                   {copied ? 'Copied' : 'Copy'}
                 </Button>
               </div>
             </div>
 
-            {/* Output Box */}
-            <div className="relative min-h-[120px] p-4 rounded-xl bg-slate-950 text-slate-100 font-mono text-xs break-all leading-relaxed select-all">
+            <div className="relative min-h-[140px] p-5 rounded-xl bg-[#0A0C10] border border-[#1E222B] font-mono text-sm break-all leading-relaxed select-all">
               {errorMessage ? (
-                <div className="text-rose-400 font-sans text-xs flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-rose-500 shrink-0" />
+                <div className="text-rose-400 font-sans text-xs flex items-start gap-2">
+                  <Shield className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                   <span>{errorMessage}</span>
                 </div>
               ) : isLoading ? (
-                <span className="text-slate-500 italic">Processing cryptographic transformation...</span>
+                <span className="text-[var(--text-secondary)] italic text-xs">
+                  Processing cryptographic transformation...
+                </span>
               ) : result?.output ? (
-                result.output
+                <span className="text-emerald-400">{result.output}</span>
               ) : (
-                <span className="text-slate-600 italic">Output will appear here automatically.</span>
+                <span className="text-[var(--text-secondary)] italic text-xs">
+                  Output will appear here automatically.
+                </span>
               )}
             </div>
 
-            {/* Metadata Footer */}
             {result && (
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
-                <span className="flex items-center gap-1 font-mono">
-                  <Clock className="w-3 h-3 text-slate-400" />
-                  Latency: {result.meta?.durationMs?.toFixed(2) ?? '0.00'} ms
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[var(--border-main)] text-[11px] font-mono text-[var(--text-secondary)]">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3 h-3" />
+                  {result.meta?.durationMs?.toFixed(2) ?? '0.00'} ms
                 </span>
 
                 {result.meta?.keyInfo && (
-                  <span className="font-mono text-[10px] text-indigo-500 dark:text-indigo-400 truncate max-w-xs">
+                  <span className="text-cyan-400 truncate max-w-xs">
                     {result.meta.keyInfo}
                   </span>
                 )}
               </div>
             )}
           </div>
+        </div>
 
-          {/* Step-by-Step Visualization (for Classical ciphers) */}
-          {isClassical && result && (
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+        {/* ============================================================
+            RIGHT COLUMN: Step Visualizer (sticky) OR Algorithm Info Panel
+        ============================================================ */}
+        <div className="lg:col-span-5 space-y-5 lg:sticky lg:top-24 lg:self-start">
+          {hasSteps ? (
+            <div className="p-5 sm:p-6 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg">
               <StepVisualizer
                 plaintext={inputText}
-                ciphertext={result.output}
+                ciphertext={result!.output}
                 algorithmName={selectedAlgo.toUpperCase()}
                 shiftOrKeyLabel={
                   selectedAlgo === 'caesar'
@@ -614,13 +755,147 @@ export function EncryptPlayground() {
                     ? `XOR Key: ${xorKey}`
                     : 'Mirror Inversion'
                 }
-                steps={result.steps}
+                steps={result!.steps}
                 mode={mode}
               />
             </div>
+          ) : (
+            <AlgorithmInfoPanel algoInfo={algoInfo} selectedAlgo={selectedAlgo} />
           )}
+
+          {/* Bottom info card always */}
+          <div className="p-5 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg space-y-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <Cpu className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-primary)]">
+                Execution Environment
+              </h3>
+            </div>
+            <div className="space-y-2 text-[11px] font-mono text-[var(--text-secondary)]">
+              <div className="flex items-center justify-between py-1 border-b border-[var(--border-main)]">
+                <span>Runtime</span>
+                <span className="text-[var(--text-primary)]">Browser Web Crypto</span>
+              </div>
+              <div className="flex items-center justify-between py-1 border-b border-[var(--border-main)]">
+                <span>Location</span>
+                <span className="text-[var(--text-primary)]">Client-side only</span>
+              </div>
+              <div className="flex items-center justify-between py-1">
+                <span>Round-trips</span>
+                <span className="text-emerald-400">0 (offline capable)</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   Algorithm Info Panel (untuk non-classical / saat belum ada steps)
+============================================================ */
+interface AlgorithmInfoPanelProps {
+  algoInfo: typeof ALGO_INFO[keyof typeof ALGO_INFO];
+  selectedAlgo: SupportedAlgo;
+}
+
+function AlgorithmInfoPanel({ algoInfo, selectedAlgo }: AlgorithmInfoPanelProps) {
+  const strengthColor = {
+    Educational: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
+    Weak: 'text-rose-400 bg-rose-500/10 border-rose-500/30',
+    Strong: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
+    Industry: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
+  }[algoInfo.strength];
+
+  return (
+    <div className="p-5 sm:p-6 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg space-y-5">
+      <div className="flex items-center gap-2.5">
+        <div className="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <Info className="w-4 h-4" />
+        </div>
+        <div>
+          <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--text-primary)]">
+            Algorithm Profile
+          </h3>
+          <p className="text-[10px] font-mono text-[var(--text-secondary)]">
+            No step-by-step trace for {algoInfo.type.toLowerCase()} ciphers
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h4 className="text-base font-bold text-[var(--text-primary)]">{algoInfo.title}</h4>
+        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+          {algoInfo.description}
+        </p>
+      </div>
+
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between py-2 border-b border-[var(--border-main)]">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+            Family
+          </span>
+          <span className="text-xs font-mono font-semibold text-[var(--text-primary)]">
+            {algoInfo.type}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between py-2 border-b border-[var(--border-main)]">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+            Security
+          </span>
+          <span
+            className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${strengthColor}`}
+          >
+            {algoInfo.strength}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between py-2 border-b border-[var(--border-main)]">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+            Keyspace
+          </span>
+          <span className="text-xs font-mono text-[var(--text-primary)]">
+            {algoInfo.keyspace}
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-[var(--border-main)]">
+        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--text-secondary)] block">
+          Key Characteristics
+        </span>
+        <ul className="space-y-1.5">
+          {algoInfo.highlights.map((h, i) => (
+            <li key={i} className="flex items-start gap-2 text-xs text-[var(--text-secondary)]">
+              <span className="w-1 h-1 rounded-full bg-cyan-400 mt-1.5 shrink-0" />
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {algoInfo.type === 'Modern' && (
+        <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-start gap-2">
+          <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
+          <span className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+            This algorithm executes via hardware-accelerated{' '}
+            <code className="text-cyan-300 font-mono">crypto.subtle</code>.
+          </span>
+        </div>
+      )}
+
+      {algoInfo.type === 'Classical' && (
+        <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-start gap-2">
+          <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+          <span className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+            Educational only. Step-by-step trace appears when you enter input text.
+          </span>
+        </div>
+      )}
     </div>
   );
 }

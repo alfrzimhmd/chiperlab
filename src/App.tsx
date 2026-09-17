@@ -3,9 +3,10 @@ import { ProgressProvider } from './context/ProgressContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ScrollToTop } from './components/common/ScrollToTop';
+import { AchievementModal } from './components/common/AchievementModal';
 
-// Pages
 import { Dashboard } from './pages/Dashboard';
+import { AboutPage } from './pages/AboutPage';
 import { LearnIndex } from './pages/learn/LearnIndex';
 import { FundamentalsList } from './pages/learn/FundamentalsList';
 import { LessonDetail } from './pages/learn/LessonDetail';
@@ -27,14 +28,18 @@ export default function App() {
     <HashRouter>
       <ProgressProvider>
         <ScrollToTop />
-        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
-          <Navbar />
-          <main className="flex-1 pb-12">
-            <Routes>
-              {/* Home / Dashboard */}
-              <Route path="/" element={<Dashboard />} />
+        <div className="min-h-screen flex flex-col bg-[var(--bg-main)] text-[var(--text-primary)] transition-colors duration-300 relative">
+          {/* Global background layers */}
+          <div className="fixed inset-0 bg-tech-grid pointer-events-none opacity-40 z-0" />
+          <div className="fixed top-[-10%] right-[-5%] w-[45vw] h-[45vw] rounded-full bg-cyan-500/5 blur-[120px] pointer-events-none z-0" />
+          <div className="fixed bottom-[-10%] left-[-5%] w-[45vw] h-[45vw] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0" />
 
-              {/* Learn Section */}
+          <Navbar />
+          <main className="flex-1 relative z-10">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/about" element={<AboutPage />} />
+
               <Route path="/learn" element={<LearnIndex />} />
               <Route path="/learn/fundamentals" element={<FundamentalsList />} />
               <Route path="/learn/fundamentals/:id" element={<LessonDetail />} />
@@ -42,26 +47,25 @@ export default function App() {
               <Route path="/learn/algorithms/:id" element={<AlgorithmDetail />} />
               <Route path="/learn/roadmap" element={<RoadmapPage />} />
 
-              {/* Playground Section */}
               <Route path="/playground" element={<PlaygroundIndex />} />
               <Route path="/playground/encrypt" element={<EncryptPlayground />} />
               <Route path="/playground/hash" element={<HashPlayground />} />
               <Route path="/playground/analyze" element={<AnalyzePlayground />} />
 
-              {/* Challenges Section */}
               <Route path="/challenges" element={<ChallengesIndex />} />
               <Route path="/challenges/quiz" element={<QuizPage />} />
               <Route path="/challenges/puzzle" element={<PuzzlePage />} />
               <Route path="/challenges/attack" element={<AttackSimPage />} />
 
-              {/* Progress & Profile */}
               <Route path="/progress" element={<ProgressPage />} />
 
-              {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
           <Footer />
+
+          {/* Global Achievement Popup */}
+          <AchievementModal />
         </div>
       </ProgressProvider>
     </HashRouter>

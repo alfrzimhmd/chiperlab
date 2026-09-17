@@ -4,6 +4,21 @@ export type HashAlgorithm = HashType;
 export type AlgorithmCategory = 'classical' | 'modern' | 'hashing';
 export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 
+/**
+ * Supported algorithm identifiers used in playground and query params.
+ * Extends CipherType to make intent clearer at call sites.
+ */
+export type SupportedAlgo = CipherType;
+
+/**
+ * Attacker techniques used in cryptanalysis attack simulation.
+ */
+export type AttackerTechnique =
+  | 'brute-force'
+  | 'frequency-analysis'
+  | 'known-plaintext'
+  | 'xor-reuse';
+
 export interface TransformationStep {
   index: number;
   inputChar: string;

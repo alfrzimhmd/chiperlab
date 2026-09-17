@@ -26,21 +26,26 @@ export function Button({
   onClick,
   ...props
 }: ButtonProps) {
-  const base = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-[0.98] select-none';
+  const base =
+    'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-[0.98] select-none';
 
   const sizes = {
-    sm: 'text-xs px-3 py-1.5 gap-1.5 min-h-[32px]',
+    sm: 'text-xs px-3.5 py-1.5 gap-1.5 min-h-[34px]',
     md: 'text-sm px-4 py-2 gap-2 min-h-[40px]',
     lg: 'text-base px-5 py-2.5 gap-2.5 min-h-[46px]',
   };
 
   const variants = {
-    primary: 'bg-sky-600 hover:bg-sky-700 text-white shadow-xs dark:bg-sky-500 dark:hover:bg-sky-600',
-    secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100',
-    outline: 'border border-slate-300 dark:border-slate-700 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200',
-    ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-300',
-    danger: 'bg-rose-600 hover:bg-rose-700 text-white shadow-xs',
-    success: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs',
+    primary:
+      'bg-cyan-500 hover:bg-cyan-400 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_28px_rgba(6,182,212,0.45)]',
+    secondary:
+      'bg-[var(--surface-secondary)] hover:bg-[var(--surface-main)] text-[var(--text-primary)] border border-[var(--border-main)]',
+    outline:
+      'border border-[var(--border-main)] bg-[var(--surface-secondary)] hover:border-cyan-500/50 hover:text-cyan-400 text-[var(--text-primary)]',
+    ghost:
+      'bg-transparent hover:bg-[var(--surface-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+    danger: 'bg-rose-600 hover:bg-rose-500 text-white',
+    success: 'bg-emerald-600 hover:bg-emerald-500 text-white',
   };
 
   return (
