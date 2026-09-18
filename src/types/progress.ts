@@ -27,6 +27,19 @@ export interface Achievement {
   unlockedAt?: string;
 }
 
+/**
+ * Saved answer for a lesson's interactive exercise.
+ * Keyed by lesson.id in UserProgress.exerciseAnswers.
+ */
+export interface ExerciseAnswer {
+  /** Index of the selected choice, OR the raw text answer */
+  answer: string | number;
+  /** Whether the saved answer was correct */
+  isCorrect: boolean;
+  /** Timestamp when the user submitted the answer */
+  answeredAt: number;
+}
+
 export interface UserProgress {
   completedLessons: string[];
   exploredAlgorithms: string[];
@@ -37,4 +50,6 @@ export interface UserProgress {
   theme: ThemeMode;
   totalXp: number;
   activityLog?: ActivityLog[];
+  /** Per-lesson exercise answers, keyed by lesson.id */
+  exerciseAnswers: Record<string, ExerciseAnswer>;
 }

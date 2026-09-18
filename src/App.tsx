@@ -22,6 +22,7 @@ import { QuizPage } from './pages/challenges/QuizPage';
 import { PuzzlePage } from './pages/challenges/PuzzlePage';
 import { AttackSimPage } from './pages/challenges/AttackSimPage';
 import { ProgressPage } from './pages/ProgressPage';
+import { ReferencesPage } from './pages/learn/ReferencesPage';
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/about/references" element={<ReferencesPage />} />
 
               <Route path="/learn" element={<LearnIndex />} />
               <Route path="/learn/fundamentals" element={<FundamentalsList />} />

@@ -1,5 +1,9 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { UserProgress, ActivityLog, ActivityType } from '../types/progress';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import {
+  UserProgress,
+  ActivityLog,
+  ExerciseAnswer,
+} from '../types/progress';
 import { getStoredProgress, saveStoredProgress } from '../utils/storage';
 import { ACHIEVEMENTS } from '../data/achievements';
 import confetti from 'canvas-confetti';
@@ -10,6 +14,17 @@ interface ProgressContextType {
   exploreAlgorithm: (algoId: string, xp?: number, name?: string) => void;
   completeChallenge: (challengeId: string, xp?: number, title?: string) => void;
   recordQuizScore: (quizId: string, score: number, xp?: number) => void;
+
+  /** Save an interactive exercise answer for a lesson */
+  saveExerciseAnswer: (
+    lessonId: string,
+    answer: string | number,
+    isCorrect: boolean
+  ) => void;
+
+  /** Retrieve a saved exercise answer */
+  getExerciseAnswer: (lessonId: string) => ExerciseAnswer | undefined;
+
   isLessonCompleted: (lessonId: string) => boolean;
   isAlgorithmExplored: (algoId: string) => boolean;
   isChallengeCompleted: (challengeId: string) => boolean;
@@ -54,7 +69,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       newlyUnlocked.push('puzzle-solver');
     }
     if (
-      (current.exploredAlgorithms.includes('sha256') || current.completedLessons.includes('hashing-foundations')) &&
+      (current.exploredAlgorithms.includes('sha256') ||
+        current.completedLessons.includes('hashing-foundations')) &&
       !current.achievements.includes('hash-master')
     ) {
       newlyUnlocked.push('hash-master');
@@ -113,7 +129,6 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
             totalXp: updated.totalXp + addedXp,
           };
 
-          // Log achievement unlock activity
           newAchievements.forEach(achId => {
             const found = ACHIEVEMENTS.find(a => a.id === achId);
             if (found) {
@@ -223,31 +238,63 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [updateProgressAndCheck]
   );
 
-  const isLessonCompleted = useCallback(
-    (lessonId: string) => {
-      return progress.completedLessons.includes(lessonId);
+  /**
+   * Save an interactive exercise answer for a lesson.
+   * Only saves the FIRST correct answer or overwrites previous incorrect attempts.
+   * If user answers correctly once, we don't let them accidentally overwrite it with wrong answers.
+   */
+  const saveExerciseAnswer = useCallback(
+    (lessonId: string, answer: string | number, isCorrect: boolean) => {
+      updateProgressAndCheck(prev => {
+        const existing = prev.exerciseAnswers?.[lessonId];
+
+        // If already answered correctly, don't overwrite with a wrong answer
+        if (existing?.isCorrect && !isCorrect) {
+          return prev;
+        }
+
+        const newAnswers = {
+          ...(prev.exerciseAnswers || {}),
+          [lessonId]: {
+            answer,
+            isCorrect,
+            answeredAt: Date.now(),
+          },
+        };
+
+        return {
+          ...prev,
+          exerciseAnswers: newAnswers,
+        };
+      });
     },
+    [updateProgressAndCheck]
+  );
+
+  const getExerciseAnswer = useCallback(
+    (lessonId: string): ExerciseAnswer | undefined => {
+      return progress.exerciseAnswers?.[lessonId];
+    },
+    [progress.exerciseAnswers]
+  );
+
+  const isLessonCompleted = useCallback(
+    (lessonId: string) => progress.completedLessons.includes(lessonId),
     [progress.completedLessons]
   );
 
   const isAlgorithmExplored = useCallback(
-    (algoId: string) => {
-      return progress.exploredAlgorithms.includes(algoId);
-    },
+    (algoId: string) => progress.exploredAlgorithms.includes(algoId),
     [progress.exploredAlgorithms]
   );
 
   const isChallengeCompleted = useCallback(
-    (challengeId: string) => {
-      return progress.completedChallenges.includes(challengeId);
-    },
+    (challengeId: string) => progress.completedChallenges.includes(challengeId),
     [progress.completedChallenges]
   );
 
   const hasAchievement = useCallback(
-    (achievementId: string) => {
-      return progress.achievements.includes(achievementId);
-    },
+    (achievementId: string) => progress.achievements.includes(achievementId),
     [progress.achievements]
   );
 
@@ -261,6 +308,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       theme: progress.theme,
       totalXp: 0,
       activityLog: [],
+      exerciseAnswers: {},
     };
     setProgressState(emptyProgress);
     saveStoredProgress(emptyProgress);
@@ -278,6 +326,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         exploreAlgorithm,
         completeChallenge,
         recordQuizScore,
+        saveExerciseAnswer,
+        getExerciseAnswer,
         isLessonCompleted,
         isAlgorithmExplored,
         isChallengeCompleted,

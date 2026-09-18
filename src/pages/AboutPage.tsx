@@ -509,12 +509,75 @@ export function AboutPage() {
       </section>
 
       {/* ============================================================
+          REFERENCES CTA
+      ============================================================ */}
+      <section className="space-y-6">
+        <div className="text-center max-w-2xl mx-auto">
+          <span className="font-mono text-sm font-bold text-cyan-400 tracking-widest block">
+            06 — REFERENCES
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight mt-1.5">
+            Academic Sources
+          </h2>
+          <p className="text-base text-[var(--text-secondary)] mt-3 leading-relaxed">
+            All ChiperLab lesson content is written based on authoritative sources — standards,
+            academic papers, and reference textbooks.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: 'Standards', count: 15, accent: 'cyan' },
+            { label: 'Papers', count: 13, accent: 'purple' },
+            { label: 'Books', count: 5, accent: 'amber' },
+            { label: 'Documentation', count: 6, accent: 'emerald' },
+          ].map((cat, idx) => (
+            <div
+              key={idx}
+              className="p-5 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg text-center"
+            >
+              <p className="text-3xl font-extrabold font-mono text-cyan-400">{cat.count}</p>
+              <p className="text-[11px] font-mono text-[var(--text-secondary)] uppercase tracking-wider mt-2">
+                {cat.label}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA Card */}
+        <Link
+          to="/about/references"
+          className="group block p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5 border border-cyan-500/30 hover:border-cyan-500/50 shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="shrink-0 w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform duration-300">
+                <BookOpen className="w-7 h-7" strokeWidth={2.5} />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-[var(--text-primary)] group-hover:text-cyan-400 transition-colors">
+                  View All References
+                </h3>
+                <p className="text-sm text-[var(--text-secondary)] mt-1">
+                  30+ academic sources, standards, and textbooks used across all lessons
+                </p>
+              </div>
+            </div>
+            <span className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-cyan-500 text-black font-mono text-xs font-bold group-hover:bg-cyan-400 transition-colors">
+              Explore Sources
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </span>
+          </div>
+        </Link>
+      </section>
+
+      {/* ============================================================
           SOCIALS / CONNECT — Clean: Icon + Label only
       ============================================================ */}
       <section className="space-y-6">
         <div className="text-center max-w-2xl mx-auto">
           <span className="font-mono text-sm font-bold text-cyan-400 tracking-widest block">
-            06 — CONNECT
+            07 — CONNECT
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight mt-1.5">
             Get in Touch
