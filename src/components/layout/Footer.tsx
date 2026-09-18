@@ -29,9 +29,9 @@ export function Footer() {
       title: 'Learn',
       links: [
         { to: '/learn', label: 'Academy Overview' },
-        { to: '/learn/fundamentals', label: '12 Fundamentals' },
+        { to: '/learn/fundamentals', label: '33 Fundamentals' },
         { to: '/learn/algorithms', label: 'Algorithms Catalog' },
-        { to: '/learn/roadmap', label: 'Learning Roadmap' },
+        { to: '/learn/encyclopedia', label: 'Crypto Encyclopedia' },
       ],
     },
     {

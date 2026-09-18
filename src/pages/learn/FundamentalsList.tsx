@@ -23,7 +23,7 @@ export function FundamentalsList() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in duration-200">
+    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in duration-200">
       {/* Back Button */}
       <Link
         to="/learn"
@@ -56,33 +56,35 @@ export function FundamentalsList() {
         </p>
       </div>
 
-      {/* Controls */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg">
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
-          <input
-            type="text"
-            placeholder="Search lessons or topics..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 rounded-lg border border-[var(--border-main)] bg-[var(--surface-secondary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 font-mono"
-          />
-        </div>
+      {/* Controls — Compact width, centered */}
+      <div className="max-w-5xl mx-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] shadow-lg">
+          <div className="relative w-full sm:w-80">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+            <input
+              type="text"
+              placeholder="Search lessons or topics..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-3 py-2 rounded-lg border border-[var(--border-main)] bg-[var(--surface-secondary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 font-mono"
+            />
+          </div>
 
-        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto">
-          {(['all', 'beginner', 'intermediate', 'advanced'] as const).map(diff => (
-            <button
-              key={diff}
-              onClick={() => setFilterDifficulty(diff)}
-              className={`px-3.5 py-2 rounded-lg text-xs font-mono font-semibold capitalize whitespace-nowrap transition-colors cursor-pointer ${
-                filterDifficulty === diff
-                  ? 'bg-cyan-500 text-black'
-                  : 'bg-[var(--surface-secondary)] text-[var(--text-secondary)] hover:bg-[var(--surface-main)] hover:text-[var(--text-primary)] border border-[var(--border-main)]'
-              }`}
-            >
-              {diff}
-            </button>
-          ))}
+          <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto">
+            {(['all', 'beginner', 'intermediate', 'advanced'] as const).map(diff => (
+              <button
+                key={diff}
+                onClick={() => setFilterDifficulty(diff)}
+                className={`px-3.5 py-2 rounded-lg text-xs font-mono font-semibold capitalize whitespace-nowrap transition-colors cursor-pointer ${
+                  filterDifficulty === diff
+                    ? 'bg-cyan-500 text-black'
+                    : 'bg-[var(--surface-secondary)] text-[var(--text-secondary)] hover:bg-[var(--surface-main)] hover:text-[var(--text-primary)] border border-[var(--border-main)]'
+                }`}
+              >
+                {diff}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -95,8 +97,8 @@ export function FundamentalsList() {
         </div>
       )}
 
-      {/* Lessons Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Lessons Grid — 3 columns max */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredLessons.map(lesson => (
           <LessonCard
             key={lesson.id}

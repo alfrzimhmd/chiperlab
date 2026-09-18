@@ -12,7 +12,7 @@ import { FundamentalsList } from './pages/learn/FundamentalsList';
 import { LessonDetail } from './pages/learn/LessonDetail';
 import { AlgorithmsList } from './pages/learn/AlgorithmsList';
 import { AlgorithmDetail } from './pages/learn/AlgorithmDetail';
-import { RoadmapPage } from './pages/learn/RoadmapPage';
+import { CryptoEncyclopedia } from './pages/learn/CryptoEncyclopedia';
 import { PlaygroundIndex } from './pages/playground/PlaygroundIndex';
 import { EncryptPlayground } from './pages/playground/EncryptPlayground';
 import { HashPlayground } from './pages/playground/HashPlayground';
@@ -47,7 +47,7 @@ export default function App() {
               <Route path="/learn/fundamentals/:id" element={<LessonDetail />} />
               <Route path="/learn/algorithms" element={<AlgorithmsList />} />
               <Route path="/learn/algorithms/:id" element={<AlgorithmDetail />} />
-              <Route path="/learn/roadmap" element={<RoadmapPage />} />
+              <Route path="/learn/encyclopedia" element={<CryptoEncyclopedia />} />
 
               <Route path="/playground" element={<PlaygroundIndex />} />
               <Route path="/playground/encrypt" element={<EncryptPlayground />} />

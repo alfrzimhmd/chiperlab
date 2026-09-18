@@ -7,24 +7,24 @@ import {
   Zap,
   ArrowRight,
   Key,
-  Compass,
-  Sparkles,
-  Fingerprint,
-  Unlock,
-  Flame,
   Target,
   Lock,
   Hash,
   Puzzle,
+  BookMarked,
+  Calendar,
+  Library,
+  Award,
+  FileText,
+  Activity,
 } from 'lucide-react';
 import { useProgress } from '../hooks/useProgress';
 import { useTypewriter } from '../hooks/useTypewriter';
 import { SafeTypewriter } from '../components/common/SafeTypewriter';
 import { LESSONS } from '../data/lessons';
 import { ALGORITHMS } from '../data/algorithms';
-import { ROADMAP_LEVELS } from '../data/roadmap';
+import { ACHIEVEMENTS } from '../data/achievements';
 import { Button } from '../components/common/Button';
-import { ProgressBar } from '../components/common/ProgressBar';
 import { Badge } from '../components/common/Badge';
 
 export function Dashboard() {
@@ -52,13 +52,32 @@ export function Dashboard() {
 
   const nextLesson =
     LESSONS.find(l => !progress.completedLessons.includes(l.id)) || LESSONS[0];
+  const nextLessonNumber = nextLesson.order;
+  const lessonProgressPercent = Math.round(
+    (completedLessonsCount / totalLessons) * 100
+  );
 
+  // XP progress toward next rank
+  const xpTargets = [
+    { min: 0, target: 150, label: 'Cryptography Apprentice', color: 'text-teal-400' },
+    { min: 150, target: 400, label: 'Security Scholar', color: 'text-cyan-400' },
+    { min: 400, target: 400, label: 'Master Cryptographer', color: 'text-amber-400' },
+  ];
   const xpRank =
     progress.totalXp >= 400
-      ? { label: 'Master Cryptographer', color: 'text-amber-400' }
+      ? xpTargets[2]
       : progress.totalXp >= 150
-      ? { label: 'Security Scholar', color: 'text-cyan-400' }
-      : { label: 'Cryptography Apprentice', color: 'text-teal-400' };
+      ? xpTargets[1]
+      : xpTargets[0];
+  const xpProgressPercent = Math.min(
+    100,
+    Math.round((progress.totalXp / xpRank.target) * 100)
+  );
+
+  // Latest achievement
+  const unlockedAchievements = progress.achievements || [];
+  const latestAchievementId = unlockedAchievements[unlockedAchievements.length - 1];
+  const latestAchievement = ACHIEVEMENTS.find(a => a.id === latestAchievementId);
 
   const highlightWords = [
     'ChiperLab',
@@ -71,7 +90,6 @@ export function Dashboard() {
     'Journey',
   ];
 
-  // Renders a headline string with accent words highlighted
   const renderHeadline = (text: string, withCursor: boolean) => (
     <>
       {text.split(' ').map((word, idx) => {
@@ -96,9 +114,9 @@ export function Dashboard() {
       <div className="fixed top-[-10%] right-[-5%] w-[45vw] h-[45vw] rounded-full bg-cyan-500/5 blur-[120px] pointer-events-none z-0" />
       <div className="fixed bottom-[-10%] left-[-5%] w-[45vw] h-[45vw] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+      <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         {/* ============================================================
-            HERO — with SafeTypewriter wrapper + translate fallback
+            HERO
         ============================================================ */}
         <section className="text-center max-w-6xl mx-auto space-y-7 pb-16 sm:pb-20">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
@@ -108,7 +126,6 @@ export function Dashboard() {
             </span>
           </div>
 
-          {/* Headline — SafeTypewriter wraps with fallback */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--text-primary)] leading-[1.15] min-h-[1.4em] sm:min-h-[1.3em] flex items-center justify-center">
             <SafeTypewriter
               fallback={
@@ -125,7 +142,7 @@ export function Dashboard() {
             </SafeTypewriter>
           </h1>
 
-          {/* Rich Description — LEBIH LEGA */}
+          {/* Description */}
           <div className="space-y-5 max-w-7xl mx-auto">
             <p className="text-xl sm:text-2xl text-[var(--text-secondary)] leading-[1.6] font-light">
               Learn Cryptography by{' '}
@@ -135,7 +152,7 @@ export function Dashboard() {
               all in one interactive academy.
             </p>
 
-            <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-[1.75] max-w-4xl mx-auto">
+            <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-[1.75]">
               From ancient Caesar shifts to modern AES-GCM and RSA-OAEP — explore how secret
               communication evolved across millennia, and why it still matters today. Every
               concept is brought to life through hands-on tools: transform plaintext into
@@ -144,7 +161,7 @@ export function Dashboard() {
               leverage the same native Web Crypto APIs that protect the modern internet.
             </p>
 
-            <p className="text-base text-[var(--text-secondary)]/85 leading-[1.7] max-w-7xl mx-auto italic">
+            <p className="text-base text-[var(--text-secondary)]/85 leading-[1.7] italic">
               No prior mathematics or cryptography background required — just curiosity, a
               browser, and the willingness to break a few codes.
             </p>
@@ -168,36 +185,42 @@ export function Dashboard() {
             </Link>
           </div>
 
-          {/* Feature highlights row — LEBIH LEBAR */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-10 max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-[var(--border-main)] bg-[var(--surface-main)]/60 backdrop-blur-sm">
-              <div className="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
-                <Lock className="w-4 h-4" strokeWidth={2.5} />
+          {/* Feature highlights row */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-10 max-w-5xl mx-auto">
+            <div className="flex items-center gap-4 px-5 py-5 rounded-xl border border-[var(--border-main)] bg-[var(--surface-main)]/60 backdrop-blur-sm">
+              <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                <Lock className="w-5 h-5" strokeWidth={2.5} />
               </div>
               <div className="text-left">
-                <p className="text-sm font-bold text-[var(--text-primary)]">8 Algorithms</p>
+                <p className="text-base font-bold text-[var(--text-primary)]">
+                  {ALGORITHMS.length} Algorithms
+                </p>
                 <p className="text-[11px] font-mono text-[var(--text-secondary)]">
                   Classical → Modern
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-[var(--border-main)] bg-[var(--surface-main)]/60 backdrop-blur-sm">
-              <div className="w-9 h-9 rounded-lg bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 shrink-0">
-                <BookOpen className="w-4 h-4" strokeWidth={2.5} />
+            <div className="flex items-center gap-4 px-5 py-5 rounded-xl border border-[var(--border-main)] bg-[var(--surface-main)]/60 backdrop-blur-sm">
+              <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 shrink-0">
+                <BookOpen className="w-5 h-5" strokeWidth={2.5} />
               </div>
               <div className="text-left">
-                <p className="text-sm font-bold text-[var(--text-primary)]">12 Lessons</p>
+                <p className="text-base font-bold text-[var(--text-primary)]">
+                  {LESSONS.length} Lessons
+                </p>
                 <p className="text-[11px] font-mono text-[var(--text-secondary)]">
-                  Fundamentals Track
+                  Three Tracks
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-5 py-4 rounded-xl border border-[var(--border-main)] bg-[var(--surface-main)]/60 backdrop-blur-sm">
-              <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
-                <Trophy className="w-4 h-4" strokeWidth={2.5} />
+            <div className="flex items-center gap-4 px-5 py-5 rounded-xl border border-[var(--border-main)] bg-[var(--surface-main)]/60 backdrop-blur-sm">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                <Trophy className="w-5 h-5" strokeWidth={2.5} />
               </div>
               <div className="text-left">
-                <p className="text-sm font-bold text-[var(--text-primary)]">Interactive Lab</p>
+                <p className="text-base font-bold text-[var(--text-primary)]">
+                  Interactive Lab
+                </p>
                 <p className="text-[11px] font-mono text-[var(--text-secondary)]">
                   100% Client-Side
                 </p>
@@ -207,27 +230,27 @@ export function Dashboard() {
         </section>
 
         {/* ============================================================
-            STATS — 4 Cards
+            STATS
         ============================================================ */}
-        <section className="space-y-4 mb-14">
-          <div className="flex items-end justify-between gap-4">
+        <section className="space-y-5 mb-14">
+          <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
               <span className="font-mono text-xs font-bold text-cyan-400 tracking-widest block">
                 01 — YOUR JOURNEY
               </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] tracking-tight mt-1">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight mt-1">
                 Learning Overview
               </h2>
             </div>
             <Link
               to="/progress"
-              className="text-[11px] font-mono font-semibold text-cyan-400 hover:text-cyan-300 whitespace-nowrap"
+              className="text-xs font-mono font-semibold text-cyan-400 hover:text-cyan-300 whitespace-nowrap"
             >
               VIEW DETAILS →
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <StatCard
               label="LESSONS"
               sublabel="Completed"
@@ -263,6 +286,8 @@ export function Dashboard() {
               value={progress.totalXp}
               icon={<Zap className="w-5 h-5" />}
               accent="amber"
+              progress={progress.totalXp}
+              progressMax={xpRank.target}
               customFooter={xpRank.label}
               customFooterColor={xpRank.color}
             />
@@ -274,53 +299,72 @@ export function Dashboard() {
         ============================================================ */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="lg:col-span-2 space-y-8">
-            <section className="space-y-4">
-              <div className="flex items-end justify-between gap-4">
+            {/* Continue Your Path */}
+            <section className="space-y-5">
+              <div className="flex items-end justify-between gap-4 flex-wrap">
                 <div>
                   <span className="font-mono text-xs font-bold text-cyan-400 tracking-widest flex items-center gap-1.5">
                     <Target className="w-3.5 h-3.5" />
                     02 — RECOMMENDED
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] tracking-tight mt-1">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight mt-1">
                     Continue Your Path
                   </h2>
                 </div>
                 <Badge variant="primary">{nextLesson.difficulty}</Badge>
               </div>
 
-              <div className="relative rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] p-5 sm:p-6 shadow-lg hover:border-cyan-500/40 transition-all duration-300">
-                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                  <div className="shrink-0 w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-                    <BookOpen className="w-5 h-5" strokeWidth={2.5} />
+              <div className="relative rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] p-6 sm:p-7 shadow-lg hover:border-cyan-500/40 transition-all duration-300">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-5">
+                  <div className="shrink-0 w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                    <BookOpen className="w-6 h-6" strokeWidth={2.5} />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <span className="text-[11px] font-mono font-bold text-[var(--text-secondary)] tracking-wider">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
+                      <span className="text-xs font-mono font-bold text-[var(--text-secondary)] tracking-wider">
                         LESSON #{String(nextLesson.order).padStart(2, '0')}
                       </span>
                       <span className="text-[var(--border-main)]">•</span>
-                      <span className="text-[11px] font-mono text-[var(--text-secondary)]">
+                      <span className="text-xs font-mono text-[var(--text-secondary)]">
                         {nextLesson.estimatedMinutes} min
                       </span>
                       <span className="text-[var(--border-main)]">•</span>
-                      <span className="text-[11px] font-mono text-amber-400 flex items-center gap-1">
-                        <Zap className="w-3 h-3 fill-amber-400" />
+                      <span className="text-xs font-mono text-amber-400 flex items-center gap-1">
+                        <Zap className="w-3.5 h-3.5 fill-amber-400" />
                         {nextLesson.xpReward} XP
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">
+                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">
                       {nextLesson.title}
                     </h3>
                     <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-5">
                       {nextLesson.description}
                     </p>
 
+                    <div className="mb-5 space-y-2">
+                      <div className="flex items-center justify-between text-[11px] font-mono">
+                        <span className="text-[var(--text-secondary)]">
+                          Lesson <strong className="text-cyan-400">{nextLessonNumber}</strong> of{' '}
+                          {totalLessons}
+                        </span>
+                        <span className="text-[var(--text-secondary)]">
+                          {lessonProgressPercent}% complete
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full bg-[var(--surface-secondary)] rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-cyan-400 to-cyan-500 rounded-full transition-all duration-700"
+                          style={{ width: `${lessonProgressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+
                     <Link to={`/learn/fundamentals/${nextLesson.id}`}>
                       <Button
-                        size="sm"
-                        icon={<ArrowRight className="w-3.5 h-3.5" />}
+                        size="md"
+                        icon={<ArrowRight className="w-4 h-4" />}
                         iconPosition="right"
                       >
                         Start Lesson
@@ -331,53 +375,56 @@ export function Dashboard() {
               </div>
             </section>
 
-            <section className="space-y-4">
+            {/* Quick Launch — 6 cards */}
+            <section className="space-y-5">
               <div>
                 <span className="font-mono text-xs font-bold text-cyan-400 tracking-widest block">
                   03 — EXPLORE
                 </span>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] tracking-tight mt-1">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight mt-1">
                   Quick Launch
                 </h2>
-                <p className="text-sm text-[var(--text-secondary)] mt-1.5">
+                <p className="text-sm text-[var(--text-secondary)] mt-2">
                   Jump straight into hands-on experimentation and challenge yourself.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 auto-rows-fr">
                 <QuickCard
                   to="/playground"
                   title="Interactive Playground"
                   desc="Encrypt and decrypt with Caesar, Atbash, Vigenère, XOR, AES-GCM, and RSA-OAEP — all in real time."
-                  icon={<Terminal className="w-5 h-5" strokeWidth={2.5} />}
+                  icon={<Terminal className="w-6 h-6" strokeWidth={2.5} />}
                   accent="cyan"
                 />
                 <QuickCard
                   to="/playground/hash"
                   title="Cryptographic Hashing"
                   desc="Generate SHA-256 and SHA-512 digests and observe the Avalanche Effect live."
-                  icon={<Hash className="w-5 h-5" strokeWidth={2.5} />}
+                  icon={<Hash className="w-6 h-6" strokeWidth={2.5} />}
                   accent="teal"
                 />
                 <QuickCard
                   to="/challenges/quiz"
                   title="Knowledge Quiz"
-                  desc="Test your understanding with 10 interactive questions across all cryptography topics."
-                  icon={<Trophy className="w-5 h-5" strokeWidth={2.5} />}
+                  desc="Test your understanding with interactive questions across all cryptography topics."
+                  icon={<Trophy className="w-6 h-6" strokeWidth={2.5} />}
                   accent="amber"
                 />
                 <QuickCard
                   to="/challenges/puzzle"
                   title="Cipher Puzzles"
                   desc="Decrypt intercepted messages using classical ciphers, XOR, and hash challenges."
-                  icon={<Puzzle className="w-5 h-5" strokeWidth={2.5} />}
+                  icon={<Puzzle className="w-6 h-6" strokeWidth={2.5} />}
                   accent="purple"
                 />
               </div>
             </section>
           </div>
 
-          <aside className="space-y-8">
+          {/* Sidebar */}
+          <aside className="space-y-6">
+            {/* Did You Know */}
             <section className="space-y-4">
               <div>
                 <span className="font-mono text-xs font-bold text-emerald-400 tracking-widest block">
@@ -388,9 +435,9 @@ export function Dashboard() {
                 </h2>
               </div>
 
-              <div className="rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] p-5 shadow-lg">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="shrink-0 w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <div className="rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] p-6 shadow-lg">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="shrink-0 w-11 h-11 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                     <Shield className="w-5 h-5" strokeWidth={2.5} />
                   </div>
                   <div className="pt-0.5">
@@ -414,47 +461,157 @@ export function Dashboard() {
               </div>
             </section>
 
+            {/* Latest Achievement — FIXED */}
             <section className="space-y-4">
-              <div className="flex items-end justify-between">
+              <div>
+                <span className="font-mono text-xs font-bold text-amber-400 tracking-widest block">
+                  05 — LATEST ACHIEVEMENT
+                </span>
+                <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight mt-1">
+                  Milestone Unlocked
+                </h2>
+              </div>
+
+              <div className="rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] p-5 shadow-lg">
+                {latestAchievement ? (
+                  <div className="flex items-start gap-3">
+                    {/* FIX: pakai Award icon, bukan teks badge */}
+                    <div className="shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <Award className="w-5 h-5" strokeWidth={2.5} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-bold text-[var(--text-primary)] leading-tight mb-1">
+                        {latestAchievement.title}
+                      </h3>
+                      <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-2">
+                        {latestAchievement.description}
+                      </p>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-400">
+                        <Zap className="w-2.5 h-2.5 fill-amber-400" />+{latestAchievement.xp} XP
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-3">
+                    <div className="shrink-0 w-12 h-12 rounded-xl bg-[var(--surface-secondary)] border border-[var(--border-main)] flex items-center justify-center text-[var(--text-secondary)]">
+                      <Award className="w-5 h-5" strokeWidth={2.5} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-bold text-[var(--text-primary)] leading-tight mb-1">
+                        No achievement yet
+                      </h3>
+                      <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-3">
+                        Complete your first lesson to unlock the "First Steps" achievement.
+                      </p>
+                      <Link to={`/learn/fundamentals/${nextLesson.id}`}>
+                        <Button size="sm" variant="outline">
+                          Start Learning
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Encyclopedia — 4 links */}
+            <section className="space-y-4">
+              <div className="flex items-end justify-between gap-2">
                 <div>
-                  <span className="font-mono text-xs font-bold text-cyan-400 tracking-widest flex items-center gap-1.5">
-                    <Compass className="w-3.5 h-3.5" />
-                    05 — ROADMAP
+                  <span className="font-mono text-xs font-bold text-amber-400 tracking-widest flex items-center gap-1.5">
+                    <Library className="w-3.5 h-3.5" />
+                    06 — LIBRARY
                   </span>
                   <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight mt-1">
-                    Learning Path
+                    Reference & Resources
                   </h2>
                 </div>
-                <Link
-                  to="/learn/roadmap"
-                  className="text-[11px] font-mono font-semibold text-cyan-400 hover:text-cyan-300 whitespace-nowrap"
-                >
-                  VIEW ALL →
-                </Link>
               </div>
 
               <div className="rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] shadow-lg overflow-hidden">
-                {ROADMAP_LEVELS.slice(0, 5).map((lvl, idx) => (
-                  <Link
-                    key={lvl.levelCode}
-                    to={lvl.route}
-                    className={`group flex items-center justify-between p-3.5 hover:bg-[var(--surface-secondary)] transition-colors ${
-                      idx !== 0 ? 'border-t border-[var(--border-main)]' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="shrink-0 w-8 h-8 rounded-md bg-[var(--surface-secondary)] border border-[var(--border-main)] flex items-center justify-center font-mono text-[11px] font-bold text-[var(--text-secondary)] group-hover:bg-cyan-500/10 group-hover:border-cyan-500/30 group-hover:text-cyan-400 transition-colors">
-                        {String(lvl.levelNumber).padStart(2, '0')}
+                {/* Timeline */}
+                <Link
+                  to="/learn/encyclopedia"
+                  className="group flex items-center justify-between p-4 hover:bg-[var(--surface-secondary)] transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="shrink-0 w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                      <Calendar className="w-4 h-4" strokeWidth={2.5} />
+                    </span>
+                    <div className="min-w-0">
+                      <span className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-amber-400 transition-colors block">
+                        Interactive Timeline
                       </span>
-                      <span className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-cyan-400 transition-colors">
-                        {lvl.title}
+                      <span className="text-[10px] font-mono text-[var(--text-secondary)] block">
+                        25 events · 2,500 years
                       </span>
                     </div>
-                    <span className="shrink-0 text-[11px] font-mono font-semibold text-amber-400 ml-2">
-                      +{lvl.xpReward}
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-[var(--text-secondary)] group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                </Link>
+
+                {/* Glossary */}
+                <Link
+                  to="/learn/encyclopedia"
+                  className="group flex items-center justify-between p-4 border-t border-[var(--border-main)] hover:bg-[var(--surface-secondary)] transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="shrink-0 w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                      <BookMarked className="w-4 h-4" strokeWidth={2.5} />
                     </span>
-                  </Link>
-                ))}
+                    <div className="min-w-0">
+                      <span className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-cyan-400 transition-colors block">
+                        Searchable Glossary
+                      </span>
+                      <span className="text-[10px] font-mono text-[var(--text-secondary)] block">
+                        100+ terms · 8 categories
+                      </span>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-[var(--text-secondary)] group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                </Link>
+
+                {/* ← BARU: References */}
+                <Link
+                  to="/about/references"
+                  className="group flex items-center justify-between p-4 border-t border-[var(--border-main)] hover:bg-[var(--surface-secondary)] transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="shrink-0 w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+                      <FileText className="w-4 h-4" strokeWidth={2.5} />
+                    </span>
+                    <div className="min-w-0">
+                      <span className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-400 transition-colors block">
+                        Master References
+                      </span>
+                      <span className="text-[10px] font-mono text-[var(--text-secondary)] block">
+                        NIST · RFC · Papers · Books
+                      </span>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-[var(--text-secondary)] group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                </Link>
+
+                {/* ← BARU: Progress */}
+                <Link
+                  to="/progress"
+                  className="group flex items-center justify-between p-4 border-t border-[var(--border-main)] hover:bg-[var(--surface-secondary)] transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="shrink-0 w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                      <Activity className="w-4 h-4" strokeWidth={2.5} />
+                    </span>
+                    <div className="min-w-0">
+                      <span className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-emerald-400 transition-colors block">
+                        My Progress & XP
+                      </span>
+                      <span className="text-[10px] font-mono text-[var(--text-secondary)] block">
+                        Achievements · Stats
+                      </span>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-[var(--text-secondary)] group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                </Link>
               </div>
             </section>
           </aside>
@@ -465,7 +622,7 @@ export function Dashboard() {
 }
 
 /* ============================================================
-   StatCard & QuickCard — tetap sama
+   StatCard
 ============================================================ */
 interface StatCardProps {
   label: string;
@@ -519,9 +676,9 @@ function StatCard({
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] p-5 shadow-lg ${a.hover} transition-all duration-300`}
+      className={`group relative overflow-hidden rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] p-6 shadow-lg ${a.hover} transition-all duration-300 flex flex-col`}
     >
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-5">
         <div>
           <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-[var(--text-secondary)]">
             {label}
@@ -531,36 +688,39 @@ function StatCard({
           </p>
         </div>
         <div
-          className={`w-10 h-10 rounded-xl ${a.bg} ${a.border} border flex items-center justify-center ${a.text} group-hover:scale-110 transition-transform duration-300`}
+          className={`w-12 h-12 rounded-xl ${a.bg} ${a.border} border flex items-center justify-center ${a.text} group-hover:scale-110 transition-transform duration-300`}
         >
           {icon}
         </div>
       </div>
-      <div className="flex items-baseline gap-1.5">
-        <span className={`text-3xl font-extrabold tracking-tight ${a.text}`}>{value}</span>
+      <div className="flex items-baseline gap-2 mb-4">
+        <span className={`text-4xl font-extrabold tracking-tight ${a.text}`}>{value}</span>
         {total !== undefined && (
-          <span className="text-xs text-[var(--text-secondary)] font-mono">/ {total}</span>
+          <span className="text-sm text-[var(--text-secondary)] font-mono">/ {total}</span>
         )}
       </div>
-      {progress !== undefined && progressMax !== undefined && (
-        <div className="mt-4">
-          <div className="h-1.5 w-full bg-[var(--surface-secondary)] rounded-full overflow-hidden">
+      <div className="mt-auto">
+        {progress !== undefined && progressMax !== undefined && (
+          <div className="h-2 w-full bg-[var(--surface-secondary)] rounded-full overflow-hidden mb-3">
             <div
               className={`h-full ${a.bar} rounded-full transition-all duration-700`}
               style={{ width: `${Math.min(100, (progress / progressMax) * 100)}%` }}
             />
           </div>
-        </div>
-      )}
-      {customFooter && (
-        <p className={`mt-4 text-[11px] font-mono font-bold ${customFooterColor || a.text}`}>
-          {customFooter}
-        </p>
-      )}
+        )}
+        {customFooter && (
+          <p className={`text-xs font-mono font-bold ${customFooterColor || a.text}`}>
+            {customFooter}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
 
+/* ============================================================
+   QuickCard
+============================================================ */
 interface QuickCardProps {
   to: string;
   title: string;
@@ -612,19 +772,19 @@ function QuickCard({ to, title, desc, icon, accent }: QuickCardProps) {
   return (
     <Link
       to={to}
-      className={`group rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] p-5 shadow-lg ${a.hover} transition-all duration-300`}
+      className={`group rounded-2xl border border-[var(--border-main)] bg-[var(--surface-main)] p-6 shadow-lg ${a.hover} transition-all duration-300 flex flex-col h-full`}
     >
       <div
-        className={`w-10 h-10 rounded-xl ${a.bg} ${a.border} border flex items-center justify-center ${a.text} mb-4 group-hover:scale-110 transition-transform duration-300`}
+        className={`w-12 h-12 rounded-xl ${a.bg} ${a.border} border flex items-center justify-center ${a.text} mb-5 group-hover:scale-110 transition-transform duration-300`}
       >
         {icon}
       </div>
       <h3
-        className={`text-sm font-bold text-[var(--text-primary)] ${a.hoverText} transition-colors mb-1.5`}
+        className={`text-base font-bold text-[var(--text-primary)] ${a.hoverText} transition-colors mb-2`}
       >
         {title}
       </h3>
-      <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{desc}</p>
+      <p className="text-sm text-[var(--text-secondary)] leading-relaxed flex-1">{desc}</p>
     </Link>
   );
 }

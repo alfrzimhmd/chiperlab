@@ -12,6 +12,7 @@ import {
   Zap,
   Info,
   Sparkles,
+  Library,
 } from 'lucide-react';
 import { ThemeToggle } from '../common/ThemeToggle';
 import { BrandIcon } from '../common/BrandIcon';
@@ -77,10 +78,10 @@ export function Navbar() {
           icon: Shield,
         },
         {
-          to: '/learn/roadmap',
-          title: 'Learning Roadmap',
-          desc: 'Level 01 → Level 07 path',
-          icon: Sparkles,
+          to: '/learn/encyclopedia',
+          title: 'Crypto Encyclopedia',
+          desc: 'Timeline & glossary',
+          icon: Library,
         },
       ],
     },
@@ -185,7 +186,7 @@ export function Navbar() {
               </div>
             </div>
 
-            {/* Brand text — SELALU TAMPIL di semua ukuran */}
+            {/* Brand text */}
             <div className="flex flex-col justify-center min-w-0">
               <span className="font-extrabold text-[13px] sm:text-[15px] tracking-tight text-[var(--text-primary)] leading-tight truncate">
                 ChiperLab
@@ -340,8 +341,8 @@ export function Navbar() {
           <MobileLink to="/learn/algorithms" onClick={closeMobile} indent accent="cyan" icon={Shield}>
             Algorithms Catalog
           </MobileLink>
-          <MobileLink to="/learn/roadmap" onClick={closeMobile} indent accent="cyan" icon={Sparkles}>
-            Learning Roadmap
+          <MobileLink to="/learn/encyclopedia" onClick={closeMobile} indent accent="cyan" icon={Library}>
+            Crypto Encyclopedia
           </MobileLink>
 
           <MobileSection label="Playground" accent="purple" />
