@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { LESSONS } from '../../data/lessons';
 import { LessonCard } from '../../components/learning/LessonCard';
 import { useProgress } from '../../hooks/useProgress';
-import { Search, BookOpen } from 'lucide-react';
+import { Search, BookOpen, ArrowLeft } from 'lucide-react';
 import { DifficultyLevel } from '../../types/crypto';
 
 export function FundamentalsList() {
@@ -23,20 +24,35 @@ export function FundamentalsList() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in duration-200">
-      {/* Header */}
-      <div className="space-y-3 max-w-2xl">
+      {/* Back Button */}
+      <Link
+        to="/learn"
+        className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-cyan-400 transition-colors"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        Back to Learn Hub
+      </Link>
+
+      {/* Header — Centered */}
+      <div className="flex flex-col items-center text-center space-y-4 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
           <BookOpen className="w-3.5 h-3.5" />
           <span className="tracking-wide uppercase text-[11px] font-medium">
-            12 Core Fundamentals
+            33 Comprehensive Lessons
           </span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[var(--text-primary)] tracking-tight">
           Cryptography Fundamentals
         </h1>
-        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-          A foundational curriculum covering core concepts from basic ciphertext transformation
-          to public key exchange and the CIA security triad.
+        <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+          A structured three-track curriculum covering 2,000 years of cryptographic evolution —
+          from ancient Caesar shifts and monoalphabetic substitutions to modern authenticated
+          encryption, elliptic curves, post-quantum lattice cryptography, and decentralized
+          blockchain trust systems.
+        </p>
+        <p className="text-xs sm:text-sm font-mono text-[var(--text-secondary)] max-w-2xl">
+          Beginner track builds the vocabulary. Intermediate track explores algorithm internals.
+          Advanced track dissects real-world attacks, protocols, and cutting-edge research.
         </p>
       </div>
 
@@ -70,6 +86,15 @@ export function FundamentalsList() {
         </div>
       </div>
 
+      {/* Results Count */}
+      {filteredLessons.length > 0 && (
+        <div className="text-center">
+          <span className="text-[11px] font-mono text-[var(--text-secondary)]">
+            Showing {filteredLessons.length} of {LESSONS.length} lessons
+          </span>
+        </div>
+      )}
+
       {/* Lessons Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredLessons.map(lesson => (
@@ -82,7 +107,7 @@ export function FundamentalsList() {
       </div>
 
       {filteredLessons.length === 0 && (
-        <div className="p-12 text-center rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] text-[var(--text-secondary)] text-sm font-mono">
+        <div className="p-12 text-center rounded-2xl bg-[var(--surface-main)] border border-[var(--border-main)] text-[var(--text-secondary)] text-sm font-mono max-w-4xl mx-auto">
           No lessons found matching "{searchQuery}". Try adjusting your search.
         </div>
       )}

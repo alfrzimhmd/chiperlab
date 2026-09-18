@@ -13,6 +13,7 @@ export const DEFAULT_PROGRESS: UserProgress = {
   totalXp: 0,
   activityLog: [],
   exerciseAnswers: {},
+  algorithmQuizAnswers: {},
 };
 
 export function getStoredProgress(): UserProgress {
@@ -28,6 +29,7 @@ export function getStoredProgress(): UserProgress {
       quizScores: parsed?.quizScores ?? {},
       activityLog: parsed?.activityLog ?? [],
       exerciseAnswers: parsed?.exerciseAnswers ?? {},
+      algorithmQuizAnswers: parsed?.algorithmQuizAnswers ?? {},
     };
   } catch (err) {
     console.warn('Failed to parse chiperlab-progress from localStorage:', err);

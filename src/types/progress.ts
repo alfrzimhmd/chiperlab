@@ -40,6 +40,21 @@ export interface ExerciseAnswer {
   answeredAt: number;
 }
 
+/**
+ * Saved answer for a single algorithm quiz question.
+ * Multiple answers per algorithm stored in UserProgress.algorithmQuizAnswers.
+ */
+export interface AlgorithmQuizAnswer {
+  /** Zero-based index of the quiz question within the algorithm */
+  quizIndex: number;
+  /** Index of the selected choice, OR the raw text answer */
+  answer: string | number;
+  /** Whether the saved answer was correct */
+  isCorrect: boolean;
+  /** Timestamp when the user submitted the answer */
+  answeredAt: number;
+}
+
 export interface UserProgress {
   completedLessons: string[];
   exploredAlgorithms: string[];
@@ -52,4 +67,6 @@ export interface UserProgress {
   activityLog?: ActivityLog[];
   /** Per-lesson exercise answers, keyed by lesson.id */
   exerciseAnswers: Record<string, ExerciseAnswer>;
+  /** Per-algorithm quiz answers, keyed by algorithm.id (array by quizIndex) */
+  algorithmQuizAnswers: Record<string, AlgorithmQuizAnswer[]>;
 }

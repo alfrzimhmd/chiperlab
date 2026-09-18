@@ -3,9 +3,11 @@ import {
   UserProgress,
   ActivityLog,
   ExerciseAnswer,
+  AlgorithmQuizAnswer,
 } from '../types/progress';
 import { getStoredProgress, saveStoredProgress } from '../utils/storage';
 import { ACHIEVEMENTS } from '../data/achievements';
+import { ALGORITHM_QUIZZES } from '../data/algorithms/quizzes';
 import confetti from 'canvas-confetti';
 
 interface ProgressContextType {
@@ -24,6 +26,20 @@ interface ProgressContextType {
 
   /** Retrieve a saved exercise answer */
   getExerciseAnswer: (lessonId: string) => ExerciseAnswer | undefined;
+
+  /** Save an algorithm quiz answer (quizIndex within algorithm) */
+  saveAlgorithmQuizAnswer: (
+    algoId: string,
+    quizIndex: number,
+    answer: string | number,
+    isCorrect: boolean
+  ) => void;
+
+  /** Retrieve all saved quiz answers for an algorithm */
+  getAlgorithmQuizAnswers: (algoId: string) => AlgorithmQuizAnswer[];
+
+  /** Check if all quizzes for an algorithm have been answered correctly */
+  isAlgorithmQuizComplete: (algoId: string) => boolean;
 
   isLessonCompleted: (lessonId: string) => boolean;
   isAlgorithmExplored: (algoId: string) => boolean;
@@ -278,6 +294,95 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [progress.exerciseAnswers]
   );
 
+  /**
+   * Save an algorithm quiz answer.
+   *
+   * Rules:
+   *  - Answers are stored as an array per algorithm (keyed by algorithm.id)
+   *  - If a quiz was already answered correctly, we do NOT overwrite with a wrong answer
+   *  - When ALL quizzes for the algorithm are correct, we mark the algorithm as explored
+   */
+  const saveAlgorithmQuizAnswer = useCallback(
+    (algoId: string, quizIndex: number, answer: string | number, isCorrect: boolean) => {
+      updateProgressAndCheck(prev => {
+        const existing = prev.algorithmQuizAnswers?.[algoId] || [];
+        const existingEntry = existing.find(a => a.quizIndex === quizIndex);
+
+        // Already correct — don't overwrite with a wrong answer
+        if (existingEntry?.isCorrect && !isCorrect) {
+          return prev;
+        }
+
+        const newEntry: AlgorithmQuizAnswer = {
+          quizIndex,
+          answer,
+          isCorrect,
+          answeredAt: Date.now(),
+        };
+
+        // Replace existing entry for this quizIndex, or append new
+        const updatedForAlgo = existing.filter(a => a.quizIndex !== quizIndex);
+        updatedForAlgo.push(newEntry);
+        updatedForAlgo.sort((a, b) => a.quizIndex - b.quizIndex);
+
+        const newAnswersMap = {
+          ...(prev.algorithmQuizAnswers || {}),
+          [algoId]: updatedForAlgo,
+        };
+
+        const next: UserProgress = {
+          ...prev,
+          algorithmQuizAnswers: newAnswersMap,
+        };
+
+        // Check if this completed all quizzes for the algorithm
+        const quizSet = ALGORITHM_QUIZZES[algoId] || [];
+        const totalQuizzes = quizSet.length;
+        const correctCount = updatedForAlgo.filter(a => a.isCorrect).length;
+
+        if (totalQuizzes > 0 && correctCount === totalQuizzes) {
+          // Mark as explored if not already
+          if (!next.exploredAlgorithms.includes(algoId)) {
+            return pushActivity(
+              {
+                ...next,
+                exploredAlgorithms: [...next.exploredAlgorithms, algoId],
+                totalXp: next.totalXp + 15,
+              },
+              {
+                type: 'algorithm-explored',
+                label: `Mastered quiz for: ${algoId}`,
+                detail: `${totalQuizzes}/${totalQuizzes} correct`,
+                xp: 15,
+              }
+            );
+          }
+        }
+
+        return next;
+      });
+    },
+    [updateProgressAndCheck]
+  );
+
+  const getAlgorithmQuizAnswers = useCallback(
+    (algoId: string): AlgorithmQuizAnswer[] => {
+      return progress.algorithmQuizAnswers?.[algoId] || [];
+    },
+    [progress.algorithmQuizAnswers]
+  );
+
+  const isAlgorithmQuizComplete = useCallback(
+    (algoId: string): boolean => {
+      const quizSet = ALGORITHM_QUIZZES[algoId] || [];
+      if (quizSet.length === 0) return false;
+      const saved = progress.algorithmQuizAnswers?.[algoId] || [];
+      const correctCount = saved.filter(a => a.isCorrect).length;
+      return correctCount === quizSet.length;
+    },
+    [progress.algorithmQuizAnswers]
+  );
+
   const isLessonCompleted = useCallback(
     (lessonId: string) => progress.completedLessons.includes(lessonId),
     [progress.completedLessons]
@@ -309,6 +414,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       totalXp: 0,
       activityLog: [],
       exerciseAnswers: {},
+      algorithmQuizAnswers: {},
     };
     setProgressState(emptyProgress);
     saveStoredProgress(emptyProgress);
@@ -328,6 +434,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         recordQuizScore,
         saveExerciseAnswer,
         getExerciseAnswer,
+        saveAlgorithmQuizAnswer,
+        getAlgorithmQuizAnswers,
+        isAlgorithmQuizComplete,
         isLessonCompleted,
         isAlgorithmExplored,
         isChallengeCompleted,

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ROADMAP_LEVELS } from '../../data/roadmap';
 import { useProgress } from '../../hooks/useProgress';
-import { Compass, CheckCircle2, ArrowRight, Clock, Zap } from 'lucide-react';
+import { Compass, CheckCircle2, ArrowRight, Clock, Zap, ArrowLeft } from 'lucide-react';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 
@@ -27,20 +27,33 @@ export function RoadmapPage() {
 
   return (
     <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in duration-200">
-      {/* Header */}
-      <div className="space-y-3 max-w-2xl">
+      {/* Back Button */}
+      <Link
+        to="/learn"
+        className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-[var(--text-secondary)] hover:text-cyan-400 transition-colors"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        Back to Learn Hub
+      </Link>
+
+      {/* Header — Centered */}
+      <div className="flex flex-col items-center text-center space-y-4 max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border border-amber-500/30 bg-amber-500/10 text-amber-400">
           <Compass className="w-3.5 h-3.5" />
           <span className="tracking-wide uppercase text-[11px] font-medium">
             Interactive Learning Path
           </span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tracking-tight">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[var(--text-primary)] tracking-tight">
           7-Level Cryptography Roadmap
         </h1>
-        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+        <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
           A structured, non-overwhelming step-by-step path from fundamental definitions to
           advanced asymmetric key exchange and cryptanalysis attacks.
+        </p>
+        <p className="text-xs sm:text-sm font-mono text-[var(--text-secondary)] max-w-2xl">
+          Each level unlocks progressively — complete the required lessons to advance from
+          foundational concepts to real-world protocol analysis and post-quantum migration.
         </p>
       </div>
 

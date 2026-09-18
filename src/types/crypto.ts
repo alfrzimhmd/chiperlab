@@ -1,7 +1,22 @@
-export type CipherType = 'caesar' | 'atbash' | 'vigenere' | 'xor' | 'aes-gcm' | 'rsa-oaep';
+export type CipherType =
+  | 'caesar'
+  | 'atbash'
+  | 'vigenere'
+  | 'xor'
+  | 'aes-gcm'
+  | 'rsa-oaep'
+  | 'base64'
+  | 'hex'
+  | 'rot13'
+  | 'chacha20'
+  | 'hmac'
+  | 'md5';
+
 export type HashType = 'SHA-256' | 'SHA-512';
 export type HashAlgorithm = HashType;
-export type AlgorithmCategory = 'classical' | 'modern' | 'hashing';
+
+export type AlgorithmCategory = 'classical' | 'modern' | 'hashing' | 'encoding';
+
 export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 
 /**
@@ -55,6 +70,6 @@ export interface BruteForceResult {
   key: number | string;
   keyLabel: string;
   result: string;
-  score: number; // Likelihood score based on common English words/letter frequencies
+  score: number;
   isLikelyMatch?: boolean;
 }

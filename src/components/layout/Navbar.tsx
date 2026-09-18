@@ -67,7 +67,7 @@ export function Navbar() {
         {
           to: '/learn/fundamentals',
           title: 'Fundamentals',
-          desc: '12 core concepts & CIA triad',
+          desc: '33 core concepts & CIA triad',
           icon: BookOpen,
         },
         {
