@@ -49,7 +49,7 @@ export function FrequencyChart({
         </div>
       </div>
 
-      <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+      <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
         {activeFrequencies.map(item => {
           const cipherBarWidth = Math.min(100, (item.percentage / maxPercentage) * 100);
           const englishBarWidth = Math.min(100, (item.expectedEnglish / maxPercentage) * 100);
